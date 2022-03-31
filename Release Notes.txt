@@ -1,0 +1,11 @@
+3/28/2022
+
+First release: Loading page and next page work on Windows 7 virtual machine, but 3D views do not (the culprit is probably pyvistaqt). Need to confirm this is specific to Windows 7 or all other machines.
+
+3/29/2022
+
+Modified protrusion removal/tracking to work for variable number of cells/pairs. Now all that is left to do is change the protrusion indices according to the results of the tracking, and gather the time-series data in statistics section. Could not get the pyvistaqt stuff to work on virtual machine, but finally tried a different physical machine and it worked: the only requirement for this software is that the machine needs a graphics processor (not just CPU!.. Although most machines should have this)
+
+3/31/2022
+
+Project is now able to track (if tracking is done in order), and generate an excel dump of the patch statistics from u-shape3D (volume and surface area). When patches disappear/have not appeared yet, the tool prints "NA" for the protrusion not found.
