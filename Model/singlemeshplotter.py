@@ -10,18 +10,24 @@ class SingleMeshPlotter:
         self.mesh = mesh
         self.plotter = pvqt.BackgroundPlotter()
         self.plotter.app_window.signal_close.connect(self.plotter_closed)
-        self.protrusion_actors = []
+        self.protrusion_actors = {}
         self.programmatically_closed = False
+
+        '''
         for i, region in enumerate(self.mesh.regions):
             # Save the protrusion actors so we can hide them later:
             self.protrusion_actors.append(
                 self.plotter.add_mesh(region,
                                       color=self.mesh.protrusion_colors[i],
                                       show_edges=False))
+        '''
+        for i, _ in enumerate(self.mesh.regions):
+            self.mesh.removed_protrusions.append(self.mesh.segmentation_unique[i + 1])
         self.base_actor = self.plotter.add_mesh(self.mesh.base_cell)
 
     # When a user checks buttons, update the mesh visualization internally:
     def update(self, checked, index):
+        print(index)
         # If checked, turn on the protrusion:
         if checked == 1:
             self.protrusion_actors[index] = self.plotter.add_mesh(

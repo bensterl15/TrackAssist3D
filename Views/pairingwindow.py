@@ -18,7 +18,7 @@ from Model.pairmeshplotter import PairMeshPlotter
 # Import the constants we need:
 from Model.constants_and_paths import MESH_PATH_OFFSET, SURFACE_SEGMENT_PATH_OFFSET, \
     PAIRING_WINDOW_BACKGROUND_PATH, PLUS_BUTTON_PATH, MINUS_BUTTON_PATH, NEXT_BUTTON_PATH, \
-    REMOVAL_PATH_OFFSET
+    REMOVAL_PATH_OFFSET, TRACKING_PATH_OFFSET
 
 def rgb_to_hex(color_vector):
     red = '{:X}'.format(int(color_vector[0] * 255))
@@ -47,17 +47,37 @@ class PairingWindow:
                                         MESH_PATH_OFFSET,
                                         'surface_1_1.mat'
                                     ))
-        path_segmentation1 = os.path.join(base_directory1,
-                                          os.path.join(
-                                              REMOVAL_PATH_OFFSET,
-                                              'surfaceSegment_1_1.mat'
-                                                       ))
 
-        path_statistics1 = os.path.join(base_directory1,
-                                         os.path.join(
-                                             REMOVAL_PATH_OFFSET,
-                                             'blebStats_1_1.mat'
-                                         ))
+        # We would like to use the previous tracking data,
+        # but if it is the very first cell in the sequence, we need to load it from removal
+        try:
+            path_segmentation1 = os.path.join(base_directory1,
+                                              os.path.join(
+                                                  TRACKING_PATH_OFFSET,
+                                                  'surfaceSegment_1_1.mat'
+                                                           ))
+
+            path_statistics1 = os.path.join(base_directory1,
+                                             os.path.join(
+                                                 TRACKING_PATH_OFFSET,
+                                                 'blebStats_1_1.mat'
+                                             ))
+            # Set up the mesh here:
+            self.mesh1 = Mesh(path_mesh1, path_segmentation1, path_statistics1, default_base=False)
+        except:
+            path_segmentation1 = os.path.join(base_directory1,
+                                              os.path.join(
+                                                  REMOVAL_PATH_OFFSET,
+                                                  'surfaceSegment_1_1.mat'
+                                                           ))
+
+            path_statistics1 = os.path.join(base_directory1,
+                                             os.path.join(
+                                                 REMOVAL_PATH_OFFSET,
+                                                 'blebStats_1_1.mat'
+                                             ))
+            # Set up the first mesh here: Set default_base to false because we want to see all protrusions at first:
+            self.mesh1 = Mesh(path_mesh1, path_segmentation1, path_statistics1, default_base=False)
 
 
         self.base_directory2 = base_directory2
@@ -73,12 +93,9 @@ class PairingWindow:
                                              REMOVAL_PATH_OFFSET,
                                              'blebStats_1_1.mat'
                                          ))
-
-        # Set up the mesh here:
-        self.mesh1 = Mesh(path_mesh1, path_segmentation1, path_statistics1)
         # The second mesh starts with all black protrusions
         # because we need to match them from mesh1:
-        self.mesh2 = Mesh(path_mesh2, path_segmentation2, path_statistics2, black_protrusions=True)
+        self.mesh2 = Mesh(path_mesh2, path_segmentation2, path_statistics2, black_protrusions=True, default_base=False)
         self.plotter = PairMeshPlotter(self.mesh1, self.mesh2)
 
         # Take care of all the GUI stuff:
@@ -144,7 +161,8 @@ class PairingWindow:
         for i in range(self.mesh1.segmentation_unique.shape[0] - 1):
             # Add the checkbox:
             chk_var = IntVar()
-            check_box = Checkbutton(lb_frame, text=f'{i + 1}', variable=chk_var,
+            u_shape_3d_index = self.mesh1.statistics['index'][i][0]
+            check_box = Checkbutton(lb_frame, text=f'{i + 1} (ID: {u_shape_3d_index})', variable=chk_var,
                              bg=rgb_to_hex(self.mesh1.protrusion_colors[i]))
             check_box.select()
             check_box.configure(command=lambda ind=i: self.checked(ind))
@@ -250,12 +268,12 @@ class PairingWindow:
                                ):
 
             # We only need one directory at this step, because only mesh 2 needs to change:
-            removal_segment_dir = os.path.join(self.base_directory2, REMOVAL_PATH_OFFSET)
-            if not Path(removal_segment_dir).is_dir():
-                os.mkdir(removal_segment_dir)
+            tracking_segment_dir = os.path.join(self.base_directory2, TRACKING_PATH_OFFSET)
+            if not Path(tracking_segment_dir).is_dir():
+                os.mkdir(tracking_segment_dir)
 
-            removal_segmentation = os.path.join(removal_segment_dir, 'surfaceSegment_1_1.mat')
-            removal_statistics = os.path.join(removal_segment_dir, 'blebStats_1_1.mat')
+            tracking_segmentation = os.path.join(tracking_segment_dir, 'surfaceSegment_1_1.mat')
+            tracking_statistics = os.path.join(tracking_segment_dir, 'blebStats_1_1.mat')
 
             # Finalize the second mesh here (update the min_index at the same time):
             self.view_manager.min_index = self.mesh2.tracking_finalize(self.mesh1,
@@ -263,17 +281,17 @@ class PairingWindow:
                                                                        self.view_manager.min_index)
 
             # Overwrite the old surface segmentation:
-            if Path(removal_segmentation).is_file():
-                os.remove(removal_segmentation)
+            if Path(tracking_segmentation).is_file():
+                os.remove(tracking_segmentation)
 
             # Overwrite the old statistics:
-            if Path(removal_segmentation).is_file():
-                os.remove(removal_segmentation)
+            if Path(tracking_statistics).is_file():
+                os.remove(tracking_statistics)
 
             data_dict = {'surfaceSegment': self.mesh2.segmentation}
 
-            savemat(removal_segmentation, data_dict, oned_as='column')
-            savemat(removal_statistics, self.mesh2.statistics, oned_as='column')
+            savemat(tracking_segmentation, data_dict, oned_as='column')
+            savemat(tracking_statistics, self.mesh2.statistics, oned_as='column')
 
             # Upon saving, would make sense to go back:
             self.back_requested()

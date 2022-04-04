@@ -10,7 +10,7 @@ from Model.constants_and_paths import MAX_PROTRUSIONS_INDEX
 
 class Mesh:
 
-    def __init__(self, path_mesh, path_segmentation, path_statistics, black_protrusions=False):
+    def __init__(self, path_mesh, path_segmentation, path_statistics, black_protrusions=False, default_base=True):
         # Load the segmentation:
         self.segmentation = self._load_segmentation(path_segmentation)
         # We mostly care about the unique segmentation
@@ -34,7 +34,10 @@ class Mesh:
         self.mesh_vertices = mesh_vertices
 
         # Prepare base segmentation
-        base_faces = mesh_faces[self.segmentation == 0]
+        if default_base:
+            base_faces = mesh_faces
+        else:
+            base_faces = mesh_faces[self.segmentation == 0]
         # Create a polydata to store the base cell:
         self.base_cell = pv.PolyData(mesh_vertices, base_faces)
 
@@ -47,11 +50,11 @@ class Mesh:
 
         # Generate black protrusions:
         if black_protrusions:
-            self.protrusion_colors = np.zeros((self.segmentation_unique.shape[0], 3))
+            self.protrusion_colors = np.zeros((self.segmentation_unique.shape[0] - 1, 3))
         # Generate ordered colors:
         else:
             # Weight the colors, because we do not want anything too close to black or white:
-            self.protrusion_colors = np.random.uniform(size=(self.segmentation_unique.shape[0], 3)) * 0.3 + 0.3
+            self.protrusion_colors = np.random.uniform(size=(self.segmentation_unique.shape[0] - 1, 3)) * 0.3 + 0.3
 
         self.removed_protrusions = []
 
@@ -62,16 +65,31 @@ class Mesh:
             if self.segmentation[i] in self.removed_protrusions:
                 self.segmentation[i] = 0
 
+        # Recalculate unique segmentation as we removed a few:
+        self.segmentation_unique = np.unique(self.segmentation)
+
         # Gather the indices of the statistics we wish to remove:
         indices_to_remove = []
         # -1 because we do not count the base:
-        for i in range(self.segmentation_unique.shape[0] - 1):
+        for i in range(np.shape(self.statistics['index'])[0]):
             if self.statistics['index'][i] in self.removed_protrusions:
                 indices_to_remove.append(i)
 
         # Finally, remove all the entries that came from removed protrusions:
         for key in self.statistics:
             self.statistics[key] = np.delete(self.statistics[key], np.array(indices_to_remove), 0)
+
+        azimuth = []
+        inclination = []
+        for protrusion in self.segmentation_unique:
+            # If zero, then we have the cell-base which is not what we are interested in:
+            if protrusion != 0:
+                angles = self._calculate_spherical_angles(protrusion=protrusion)
+                azimuth.append(angles[0])
+                inclination.append(angles[1])
+
+        self.statistics['azimuth'] = np.array(azimuth)
+        self.statistics['inclination'] = np.array(inclination)
 
     # When the user saves progress of tracking, finalize the SECOND MESH ONLY:
     def tracking_finalize(self, previous_mesh, pairings, min_index):
@@ -124,6 +142,51 @@ class Mesh:
             segmentation = segment_dict['surfaceSegment']
             segmentation = np.squeeze(segmentation)
         return segmentation
+
+    def _calculate_spherical_angles(self, protrusion):
+        # First load the list of faces:
+        faces = self.mesh_faces[self.segmentation == protrusion]
+        # We only care about the unique vertices that are in the list:
+        faces = np.unique(faces.flatten())
+        vertices_unique = self.mesh_vertices[faces]
+        mean = np.mean(vertices_unique, axis=0)
+        vertices_centered = vertices_unique - mean
+        # This is like an estimation of multi-dimensional normal covariance matrix estimator:
+        cov_hat = np.matmul(np.transpose(vertices_centered), vertices_centered) / (np.shape(vertices_centered)[0] - 1)
+        L,Q = np.linalg.eig(cov_hat)
+        greatest_eval_index = np.argmax(L)
+        principal_direction = Q[:, greatest_eval_index]
+
+        # x^z + y^2 + z^2 = 1, because eig produces unitary Q
+        x = principal_direction[0]
+        y = principal_direction[1]
+        z = principal_direction[2]
+
+        azimuth = 0
+        # Need to break up cases to make calculation numerically stable:
+        if x > 0:
+            azimuth = np.arctan(y / x)
+        elif x < 0 and y >= 0:
+            azimuth = np.arctan(y / x) + np.pi
+        elif x < 0 and y < 0:
+            azimuth = np.arctan(y / x) - np.pi
+        elif x == 0 and y > 0:
+            azimuth = np.pi / 2
+        elif x == 0 and y < 0:
+            azimuth = -np.pi / 2
+        # Do not address x=0,y=0 as this angle is undefined and
+        # occurs with probability zero, hopefully:
+        inclination = np.arccos(z)
+
+        # Report in degrees:
+        azimuth = np.degrees(azimuth)
+        inclination = np.degrees(inclination)
+
+        azimuth = (azimuth + 36000) % 360
+        inclination = (inclination + 36000) % 360
+
+        return (azimuth, inclination)
+
 
     # Don't know how, but this should be STATIC METHOD:
     # (We will use it again later in the statistics step:)

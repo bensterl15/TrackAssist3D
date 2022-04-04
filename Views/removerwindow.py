@@ -111,7 +111,9 @@ class RemoverWindow:
             chk_var = IntVar()
             check_box = Checkbutton(self.lb_frame, text=f'{i + 1}', variable=chk_var,
                                     bg=rgb_to_hex(self.mesh.protrusion_colors[i]))
-            check_box.select()
+
+            # Uncomment following line if we want it checked by default:
+            # check_box.select()
             check_box.configure(command=lambda ind=i: self.checked(ind))
             self.checked_vars.append(chk_var)
             self.text.window_create("end", window=check_box)

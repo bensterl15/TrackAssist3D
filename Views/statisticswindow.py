@@ -5,7 +5,7 @@ from PIL import ImageTk, Image
 
 # Import the constants we need:
 from Model.constants_and_paths import LOADING_WINDOW_BACKGROUND_PATH, \
-    PLUS_BUTTON_PATH, MINUS_BUTTON_PATH, NEXT_BUTTON_PATH, REMOVAL_PATH_OFFSET
+    PLUS_BUTTON_PATH, MINUS_BUTTON_PATH, NEXT_BUTTON_PATH, TRACKING_PATH_OFFSET, REMOVAL_PATH_OFFSET
 
 from Model.mesh import Mesh
 
@@ -62,9 +62,12 @@ class StatisticsWindow:
 
     def _gather_unique_cell_indices(self):
         indices = []
-        for cell_path in self.view_manager.base_dirs:
+        for index, cell_path in enumerate(self.view_manager.base_dirs):
             # Folder location:
-            stats_path = os.path.join(cell_path, REMOVAL_PATH_OFFSET)
+            if index > 0:
+                stats_path = os.path.join(cell_path, TRACKING_PATH_OFFSET)
+            else:
+                stats_path = os.path.join(cell_path, REMOVAL_PATH_OFFSET)
             # Add the file name:
             stats_path = os.path.join(stats_path, 'blebStats_1_1.mat')
             # The None is because we are using this as static method:
@@ -74,7 +77,7 @@ class StatisticsWindow:
         return list(np.unique(indices))
 
     def _gather_stats_keys(self):
-        stats_path = os.path.join(self.view_manager.base_dirs[0], REMOVAL_PATH_OFFSET)
+        stats_path = os.path.join(self.view_manager.base_dirs[1], TRACKING_PATH_OFFSET)
         stats_path = os.path.join(stats_path, 'blebStats_1_1.mat')
         stats_dict = Mesh.load_statistics(None, stats_path)
         stats_list = list(stats_dict.keys())
@@ -84,7 +87,10 @@ class StatisticsWindow:
     def _load_line_of_stats(self, stat_key, cell_num, protrusion_indices):
         current_cell_path= self.view_manager.base_dirs[cell_num]
         # Folder location:
-        stats_path = os.path.join(current_cell_path, REMOVAL_PATH_OFFSET)
+        if cell_num > 0:
+            stats_path = os.path.join(current_cell_path, TRACKING_PATH_OFFSET)
+        else:
+            stats_path = os.path.join(current_cell_path, REMOVAL_PATH_OFFSET)
         # Add the file name:
         stats_path = os.path.join(stats_path, 'blebStats_1_1.mat')
         # The None is because we are using this as static method:
