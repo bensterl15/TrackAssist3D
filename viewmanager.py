@@ -7,7 +7,7 @@ from Views.loadingwindow import LoadingWindow
 from Views.stepswindow import StepsWindow
 from Views.statisticswindow import StatisticsWindow
 
-from Model.constants_and_paths import VALID_USHAPE3D_DIR_ERROR_MSG, ICON_PATH
+from Model.constants_and_paths import VALID_USHAPE3D_DIR_ERROR_MSG, ICON_PATH, TRACKING_PATH_OFFSET
 
 class ViewManager:
     """Class that manages the views (changes views etc etc)"""
@@ -48,7 +48,16 @@ class ViewManager:
             PairingWindow(self.active_window, self, base_directory1=self.base_dirs[self.active_pair],
                           base_directory2=self.base_dirs[self.active_pair + 1])
         elif current_view == 'stats':
-            StatisticsWindow(self.active_window, self)
+            incomplete_tracking_pairs = self.tracking_incomplete()
+            if not incomplete_tracking_pairs:
+                StatisticsWindow(self.active_window, self)
+            else:
+                incomplete_tracking_pairs = [f'from {i} to {i+1}' for i in incomplete_tracking_pairs]
+                messagebox.\
+                    showerror('Error',
+                              'The following tracking has not been performed: '
+                              + ', '.join(incomplete_tracking_pairs))
+                StepsWindow(self.active_window, self)
 
         self.active_window.title('FiloTracker')
         self.active_window.geometry("1200x800+50+50")
@@ -89,3 +98,13 @@ class ViewManager:
     def back_to_step(self):
         """Change to the steps view:"""
         self.change_view('step')
+
+    def tracking_incomplete(self):
+        """Job of this method is to check whether we are ready for results:"""
+        incomplete_pairs = []
+        for index, dir_ in enumerate(self.base_dirs):
+            t_dir = os.path.join(dir_, TRACKING_PATH_OFFSET)
+            # We expect that the first model does not have tracking data:
+            if not os.path.exists(t_dir) and index > 0:
+                incomplete_pairs.append(index)
+        return incomplete_pairs

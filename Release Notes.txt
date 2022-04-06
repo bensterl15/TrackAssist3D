@@ -9,3 +9,7 @@ Modified protrusion removal/tracking to work for variable number of cells/pairs.
 3/31/2022
 
 Project is now able to track (if tracking is done in order), and generate an excel dump of the patch statistics from u-shape3D (volume and surface area). When patches disappear/have not appeared yet, the tool prints "NA" for the protrusion not found.
+
+4/4/2022
+
+Fixed tracking/removal bugs, resolved pylint issues, came up with method to estimate protrusion tangent vectors with Gaussian fit/eigen-decomposition (and report spherical angles that came out of these tangent vectors)

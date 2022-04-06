@@ -6,6 +6,7 @@ from PIL import ImageTk, Image
 from Model.constants_and_paths import LOADING_WINDOW_BACKGROUND_PATH, \
     PLUS_BUTTON_PATH, MINUS_BUTTON_PATH, NEXT_BUTTON_PATH
 
+
 class LoadingWindow:
 
     def __init__(self, win, view_manager):
@@ -35,13 +36,13 @@ class LoadingWindow:
         self.background = Label(win, image=background_img)
         self.background.image = background_img
         self.background.place(
-            x=(1200 - background_width)/2, y=50
+            x=(1200 - background_width) / 2, y=50
         )
 
         self.description_label = Label(win,
-           text='Select the u-shape3D project directories IN ORDER:')
+                                       text='Select the u-shape3D project directories IN ORDER:')
         self.description_label.config(font=("Courier", 12))
-        self.description_label.place(x=(1200-background_width)/2, y=375)
+        self.description_label.place(x=(1200 - background_width) / 2, y=375)
 
         add_button = Button(win, text='+', command=self.add, image=plus_button_img)
         delete_button = Button(win, text='-', command=self.delete, image=delete_button_img)
@@ -49,13 +50,13 @@ class LoadingWindow:
         add_button.image = plus_button_img
         delete_button.image = delete_button_img
         next_button.image = next_button_img
-        add_button.place(x=(1200-background_width)/2 + 650, y=500)
-        delete_button.place(x=(1200-background_width)/2 + 705, y=500)
+        add_button.place(x=(1200 - background_width) / 2 + 650, y=500)
+        delete_button.place(x=(1200 - background_width) / 2 + 705, y=500)
         next_button.place(x=1100, y=700)
 
         self.folders_var = StringVar()
         self.lb_frame = Frame(win, width=background_width, height=background_height)
-        self.lb_frame.place(x=(1200-background_width)/2, y=500)
+        self.lb_frame.place(x=(1200 - background_width) / 2, y=500)
         self.listbox = Listbox(self.lb_frame,
                                listvariable=self.folders_var,
                                width=80,

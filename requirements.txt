@@ -1,0 +1,6 @@
+mat73==0.58
+numpy==1.21.5
+Pillow==9.1.0
+pyvista==0.33.3
+pyvistaqt==0.7.0
+scipy==1.7.3

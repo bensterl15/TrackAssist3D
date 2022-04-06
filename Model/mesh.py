@@ -153,7 +153,7 @@ class Mesh:
         vertices_centered = vertices_unique - mean
         # This is like an estimation of multi-dimensional normal covariance matrix estimator:
         cov_hat = np.matmul(np.transpose(vertices_centered), vertices_centered) / (np.shape(vertices_centered)[0] - 1)
-        L,Q = np.linalg.eig(cov_hat)
+        L, Q = np.linalg.eig(cov_hat)
         greatest_eval_index = np.argmax(L)
         principal_direction = Q[:, greatest_eval_index]
 
