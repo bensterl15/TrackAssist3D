@@ -12,7 +12,7 @@ class Mesh:
 
     def __init__(self, path_mesh, path_segmentation, path_statistics, black_protrusions=False, default_base=True):
         # Load the segmentation:
-        self.segmentation = self._load_segmentation(path_segmentation)
+        self.segmentation = self.load_segmentation(path_segmentation)
         # We mostly care about the unique segmentation
         self.segmentation_unique = np.unique(self.segmentation)
 
@@ -92,56 +92,21 @@ class Mesh:
         self.statistics['inclination'] = np.array(inclination)
 
     # When the user saves progress of tracking, finalize the SECOND MESH ONLY:
-    def tracking_finalize(self, previous_mesh, pairings, min_index):
-        # First, change all protrusions to be unique:
-        used_protrusions = list(np.unique(previous_mesh.segmentation))
+    def tracking_finalize(self, previous_mesh, pairings):
         # [1:] because we ignore the base of zero:
-        used_protrusions = used_protrusions[1:]
         p1_indices = previous_mesh.segmentation_unique[1:]
         p2_indices = self.segmentation_unique[1:]
-        min_index = max(min_index, max(np.max(used_protrusions), np.max(p2_indices)))
-        for ind in p2_indices:
-            # If an index in mesh2 just happens to be in mesh1 already, we need to change it:
-            if ind in used_protrusions:
-                while True:
-                    new_ind = randint(min_index, MAX_PROTRUSIONS_INDEX)
-                    if new_ind not in used_protrusions:
-                        self.segmentation[self.segmentation == ind] = new_ind
-                        min_index = new_ind
-                        break
-            used_protrusions.append(ind)
 
-        # Once all protrusion ID's are unique between meshes 1 and 2,
-        # relabel the tracked protrusions in mesh 2:
+        index_permutation = {}
+
+        # Save all protrusion permutation's so that tracking can be
+        # performed upon statistic compilation:
         for protrusion_one_index in pairings:
-            # Pairings is the order of the cell, we put it through p1_indices and p2_indices
-            # to get u-shape3D coordinates:
-            self.segmentation[
-                self.segmentation == p2_indices[pairings[protrusion_one_index]]
-            ] = p1_indices[protrusion_one_index]
+            index_permutation[
+                int(p1_indices[protrusion_one_index])
+            ] = int(p2_indices[pairings[protrusion_one_index]])
 
-            # We also want to update the index in the statistics as well (will make our job easier in the next section):
-            self.statistics['index'][
-                self.statistics['index'] == p2_indices[pairings[protrusion_one_index]]
-                ] = p1_indices[protrusion_one_index]
-
-        return min_index
-
-    # Private method:
-    def _load_segmentation(self, path_segmentation):
-        # mat file is either new or old version:
-        try:
-            segment_dict = mat73.loadmat(path_segmentation)
-        except:
-            segment_dict = loadmat(path_segmentation)
-
-        # Mat file contains either blebSegment variable or surfaceSegment variable:
-        try:
-            segmentation = segment_dict['blebSegment']
-        except:
-            segmentation = segment_dict['surfaceSegment']
-            segmentation = np.squeeze(segmentation)
-        return segmentation
+        return index_permutation
 
     def _calculate_spherical_angles(self, protrusion):
         # First load the list of faces:
@@ -208,3 +173,18 @@ class Mesh:
             converted_stats_dict = stats_dict
 
         return converted_stats_dict
+
+    def load_segmentation(self, path_segmentation):
+        # mat file is either new or old version:
+        try:
+            segment_dict = mat73.loadmat(path_segmentation)
+        except:
+            segment_dict = loadmat(path_segmentation)
+
+        # Mat file contains either blebSegment variable or surfaceSegment variable:
+        try:
+            segmentation = segment_dict['blebSegment']
+        except:
+            segmentation = segment_dict['surfaceSegment']
+            segmentation = np.squeeze(segmentation)
+        return segmentation

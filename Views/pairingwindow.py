@@ -4,7 +4,7 @@ from pathlib import Path
 from tkinter import messagebox, Label, Button, Frame, Scrollbar, \
     Text, IntVar, Checkbutton, StringVar, OptionMenu
 import numpy as np
-from scipy.io import savemat
+import json
 from PIL import ImageTk, Image
 from Model.mesh import Mesh
 from Model.pairmeshplotter import PairMeshPlotter
@@ -174,27 +174,18 @@ class PairingWindow:
             if not Path(tracking_segment_dir).is_dir():
                 os.mkdir(tracking_segment_dir)
 
-            tracking_segmentation = os.path.join(tracking_segment_dir, 'surfaceSegment_1_1.mat')
-            tracking_statistics = os.path.join(tracking_segment_dir, 'blebStats_1_1.mat')
+            tracking_dict = os.path.join(tracking_segment_dir, 'protrusion_permutation.txt')
 
             # Finalize the second mesh here (update the min_index at the same time):
-            self.view_manager.min_index = \
-                self.mesh2.tracking_finalize(self.mesh1,
-                                             self.plotter.protrusion_pairings,
-                                             self.view_manager.min_index)
+            permutations = self.mesh2.tracking_finalize(self.mesh1, self.plotter.protrusion_pairings)
 
-            # Overwrite the old surface segmentation:
-            if Path(tracking_segmentation).is_file():
-                os.remove(tracking_segmentation)
+            # Overwrite the old permutation dictionary:
+            if Path(tracking_dict).is_file():
+                os.remove(tracking_dict)
 
-            # Overwrite the old statistics:
-            if Path(tracking_statistics).is_file():
-                os.remove(tracking_statistics)
-
-            data_dict = {'surfaceSegment': self.mesh2.segmentation}
-
-            savemat(tracking_segmentation, data_dict, oned_as='column')
-            savemat(tracking_statistics, self.mesh2.statistics, oned_as='column')
+            # Save the new permutation dictionary:
+            with open(tracking_dict, 'w') as file:
+                json.dump(permutations, file)
 
             # Upon saving, would make sense to go back:
             self.back_requested()
