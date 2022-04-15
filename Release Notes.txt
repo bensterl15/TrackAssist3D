@@ -13,3 +13,7 @@ Project is now able to track (if tracking is done in order), and generate an exc
 4/4/2022
 
 Fixed tracking/removal bugs, resolved pylint issues, came up with method to estimate protrusion tangent vectors with Gaussian fit/eigen-decomposition (and report spherical angles that came out of these tangent vectors)
+
+4/6/2022
+
+Tracking works in any order now!
