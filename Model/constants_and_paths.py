@@ -13,10 +13,10 @@ def resource_path(relative_path):
 
     return os.path.join(base_path, relative_path)
 
-ANALYSIS_OFFSET = 'Morphology\\Analysis\\'
-MESH_PATH_OFFSET = os.path.join(ANALYSIS_OFFSET, 'Mesh\\ch1\\')
-SURFACE_SEGMENT_PATH_OFFSET = os.path.join(ANALYSIS_OFFSET, 'SurfaceSegment\\ch1\\')
-MOTIF_SEGMENT_PATH_OFFSET = os.path.join(ANALYSIS_OFFSET, 'MotifSegment\\')
+ANALYSIS_OFFSET = os.path.join('Morphology', 'Analysis')
+MESH_PATH_OFFSET = os.path.join(ANALYSIS_OFFSET, os.path.join('Mesh', 'ch1'))
+SURFACE_SEGMENT_PATH_OFFSET = os.path.join(ANALYSIS_OFFSET, os.path.join('SurfaceSegment', 'ch1'))
+MOTIF_SEGMENT_PATH_OFFSET = os.path.join(ANALYSIS_OFFSET, 'MotifSegment')
 REMOVAL_PATH_OFFSET = os.path.join(ANALYSIS_OFFSET, 'FiloTracker_Protrusion_Removal')
 TRACKING_PATH_OFFSET = os.path.join(ANALYSIS_OFFSET, 'FiloTracker_Protrusion_Tracking')
 

@@ -46,7 +46,7 @@ class RemoverWindow:
         path_segmentation = os.path.join(base_directory,
                                          os.path.join(
                                              MOTIF_SEGMENT_PATH_OFFSET,
-                                             'ch1\\blebSegment_1_1.mat'
+                                             os.path.join('ch1', 'blebSegment_1_1.mat')
                                          )
                                          )
 

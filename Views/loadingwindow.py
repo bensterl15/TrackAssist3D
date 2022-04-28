@@ -50,8 +50,8 @@ class LoadingWindow:
         add_button.image = plus_button_img
         delete_button.image = delete_button_img
         next_button.image = next_button_img
-        add_button.place(x=(1200 - background_width) / 2 + 650, y=500)
-        delete_button.place(x=(1200 - background_width) / 2 + 705, y=500)
+        add_button.place(x=(1200 - background_width) / 2 + 850, y=500)
+        delete_button.place(x=(1200 - background_width) / 2 + 905, y=500)
         next_button.place(x=1100, y=700)
 
         self.folders_var = StringVar()
