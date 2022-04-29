@@ -54,9 +54,11 @@ class StepsWindow:
         self.view_manager.change_to_removal_view(int(removal_selection) - 1)
 
     def tracking_view_requested(self):
-        tracking_pair_number = self.tracking_box_var.get()[0]
+        tracking_pair_number = self.tracking_box_var.get()
+        tracking_pair_number = tracking_pair_number.split(' to ')[0]
+        tracking_pair_number = int(tracking_pair_number)
         # -1 because index is zero-based:
-        self.view_manager.change_to_tracking_view(int(tracking_pair_number) - 1)
+        self.view_manager.change_to_tracking_view(tracking_pair_number - 1)
 
     def stats_view_requested(self):
         self.view_manager.change_to_stats_view()
