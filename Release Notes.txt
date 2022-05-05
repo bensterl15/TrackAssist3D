@@ -17,3 +17,9 @@ Fixed tracking/removal bugs, resolved pylint issues, came up with method to esti
 4/6/2022
 
 Tracking works in any order now!
+
+5/5/2022
+
+Fixed tracking modulo bug a while back..
+
+Format: FiloTracker_4_6_22.7z
