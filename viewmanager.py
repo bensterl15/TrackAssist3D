@@ -25,8 +25,8 @@ class ViewManager:
         # Keep track of a minimum index if we need to relabel protrusions:
         self.min_index = 0
 
-        self.active_window.title('FiloTracker')
-        self.active_window.geometry("1200x800+50+50")
+        self.active_window.title('TrackAssist3D')
+        self.active_window.geometry("500x500")
         self.active_window.mainloop()
 
 

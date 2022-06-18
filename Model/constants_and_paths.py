@@ -1,7 +1,7 @@
 import os
 import sys
 
-DEBUG = False
+DEBUG = True
 
 def resource_path(relative_path):
     """ Get absolute path to resource, works for dev and for PyInstaller """
@@ -24,15 +24,16 @@ VALID_USHAPE3D_DIR_ERROR_MSG = 'Please ensure all directories are valid u-shape3
 MAX_PROTRUSIONS_INDEX = 1e8
 
 if DEBUG:
-    PAIRING_WINDOW_BACKGROUND_PATH = "C:\\Users\\bsterling\\Pictures\\FiloTracker Logo.PNG"
+    ROOT_STR = "C:\\Users\\jewel\\Desktop\\Project Files\\FiloTracker\\"
+    PAIRING_WINDOW_BACKGROUND_PATH = ROOT_STR + "TA3D_Logo.PNG"
     REMOVER_WINDOW_BACKGROUND_PATH = PAIRING_WINDOW_BACKGROUND_PATH
     LOADING_WINDOW_BACKGROUND_PATH = PAIRING_WINDOW_BACKGROUND_PATH
-    PLUS_BUTTON_PATH = "C:\\Users\\bsterling\\Pictures\\plus_button.PNG"
-    MINUS_BUTTON_PATH = "C:\\Users\\bsterling\\Pictures\\minus_button.PNG"
-    NEXT_BUTTON_PATH = "C:\\Users\\bsterling\\Pictures\\next_button.PNG"
-    ICON_PATH = "C:\\Users\\bsterling\\Pictures\\filotracker.ico"
+    PLUS_BUTTON_PATH = ROOT_STR + "plus_button.PNG"
+    MINUS_BUTTON_PATH = ROOT_STR+"minus_button.PNG"
+    NEXT_BUTTON_PATH = ROOT_STR+"next_button.PNG"
+    ICON_PATH = ROOT_STR+"filotracker.ico"
 else:
-    PAIRING_WINDOW_BACKGROUND_PATH = resource_path('FiloTracker Logo.PNG')
+    PAIRING_WINDOW_BACKGROUND_PATH = resource_path('TA3D_Logo.PNG')
     REMOVER_WINDOW_BACKGROUND_PATH = PAIRING_WINDOW_BACKGROUND_PATH
     LOADING_WINDOW_BACKGROUND_PATH = PAIRING_WINDOW_BACKGROUND_PATH
     PLUS_BUTTON_PATH = resource_path("plus_button.PNG")

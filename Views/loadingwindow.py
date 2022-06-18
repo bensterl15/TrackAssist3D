@@ -13,6 +13,7 @@ class LoadingWindow:
         self.win = win
         self.view_manager = view_manager
 
+        # Background
         background_load = Image.open(LOADING_WINDOW_BACKGROUND_PATH)
         background_width = 800
         background_height = 300
@@ -20,6 +21,7 @@ class LoadingWindow:
             (background_width, background_height), Image.ANTIALIAS)
         background_img = ImageTk.PhotoImage(background_load)
 
+        # Buttons
         button_width = 50
         plus_button_load = Image.open(PLUS_BUTTON_PATH)
         delete_button_load = Image.open(MINUS_BUTTON_PATH)
@@ -44,12 +46,15 @@ class LoadingWindow:
         self.description_label.config(font=("Courier", 12))
         self.description_label.place(x=(1200 - background_width) / 2, y=375)
 
-        add_button = Button(win, text='+', command=self.add, image=plus_button_img)
-        delete_button = Button(win, text='-', command=self.delete, image=delete_button_img)
-        next_button = Button(win, text='Next', command=self.next, image=next_button_img)
-        add_button.image = plus_button_img
-        delete_button.image = delete_button_img
-        next_button.image = next_button_img
+        add_button = Button(win, text='Add Directory', command=self.add)
+        delete_button = Button(win, text='Delete Directory', command=self.delete)
+        next_button = Button(win, text='Continue', command=self.next)
+
+        # The buttons with images were cute, but not necessary.
+        # add_button.image = plus_button_img
+        # delete_button.image = delete_button_img
+        # next_button.image = next_button_img
+
         add_button.place(x=(1200 - background_width) / 2 + 850, y=500)
         delete_button.place(x=(1200 - background_width) / 2 + 905, y=500)
         next_button.place(x=1100, y=700)
