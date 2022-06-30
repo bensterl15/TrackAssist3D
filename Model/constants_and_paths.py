@@ -31,7 +31,7 @@ if DEBUG:
     PLUS_BUTTON_PATH = ROOT_STR + "plus_button.PNG"
     MINUS_BUTTON_PATH = ROOT_STR+"minus_button.PNG"
     NEXT_BUTTON_PATH = ROOT_STR+"next_button.PNG"
-    ICON_PATH = ROOT_STR+"filotracker.ico"
+    ICON_PATH = ROOT_STR+"TA3D_Icon.ico"
 else:
     PAIRING_WINDOW_BACKGROUND_PATH = resource_path('TA3D_Logo.PNG')
     REMOVER_WINDOW_BACKGROUND_PATH = PAIRING_WINDOW_BACKGROUND_PATH
@@ -39,4 +39,4 @@ else:
     PLUS_BUTTON_PATH = resource_path("plus_button.PNG")
     MINUS_BUTTON_PATH = resource_path("minus_button.PNG")
     NEXT_BUTTON_PATH = resource_path("next_button.PNG")
-    ICON_PATH = resource_path("filotracker.ico")
+    ICON_PATH = resource_path("TA3D_Icon.ico")

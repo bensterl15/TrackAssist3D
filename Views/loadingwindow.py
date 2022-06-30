@@ -13,55 +13,67 @@ class LoadingWindow:
         self.win = win
         self.view_manager = view_manager
 
-        # Background
+        # Initialize background variables
         background_load = Image.open(LOADING_WINDOW_BACKGROUND_PATH)
-        background_width = 800
-        background_height = 300
+        background_width = 550
+        background_height = 125
         background_load = background_load.resize(
             (background_width, background_height), Image.ANTIALIAS)
         background_img = ImageTk.PhotoImage(background_load)
 
-        # Buttons
-        button_width = 50
-        plus_button_load = Image.open(PLUS_BUTTON_PATH)
-        delete_button_load = Image.open(MINUS_BUTTON_PATH)
-        next_button_load = Image.open(NEXT_BUTTON_PATH)
-        plus_button_load = plus_button_load.resize((button_width, button_width), Image.ANTIALIAS)
-        delete_button_load = delete_button_load.resize(
-            (button_width, button_width), Image.ANTIALIAS
-        )
-        next_button_load = next_button_load.resize((button_width, button_width), Image.ANTIALIAS)
-        plus_button_img = ImageTk.PhotoImage(plus_button_load)
-        delete_button_img = ImageTk.PhotoImage(delete_button_load)
-        next_button_img = ImageTk.PhotoImage(next_button_load)
 
+        # TODO: Decide whether or not to delete this entirely (probably)
+        # button_width = 50
+        # plus_button_load = Image.open(PLUS_BUTTON_PATH)
+        # delete_button_load = Image.open(MINUS_BUTTON_PATH)
+        # next_button_load = Image.open(NEXT_BUTTON_PATH)
+        # plus_button_load = plus_button_load.resize((button_width, button_width), Image.ANTIALIAS)
+        # delete_button_load = delete_button_load.resize((button_width, button_width), Image.ANTIALIAS)
+        # next_button_load = next_button_load.resize((button_width, button_width), Image.ANTIALIAS)
+        # plus_button_img = ImageTk.PhotoImage(plus_button_load)
+        # delete_button_img = ImageTk.PhotoImage(delete_button_load)
+        # next_button_img = ImageTk.PhotoImage(next_button_load)
+
+        # Add and position background to window
         self.background = Label(win, image=background_img)
         self.background.image = background_img
-        self.background.place(
-            x=(1200 - background_width) / 2, y=50
-        )
+        self.background.place(x=0, y=0)
 
-        self.description_label = Label(win,
-                                       text='Select the u-shape3D project directories IN ORDER:')
-        self.description_label.config(font=("Courier", 12))
-        self.description_label.place(x=(1200 - background_width) / 2, y=375)
+        # Add and position welcome message to window
+        self.welcome_label = Label(win, text='Welcome to TrackAssist3D')
+        self.welcome_label.config(font=("Times", 14, "bold italic"))
+        self.welcome_label.place(x=170, y=130)
 
+        # Add and position directions to window
+        self.description1_label = Label(win,
+            text='If all u-shape3D project directories are in one folder, add the parent directory.')
+        self.description1_label.config(font=("Times", 12))
+        self.description1_label.place(x=20, y=160)
+
+        self.description2_label = Label(win,
+            text='If u-shape3D project directories are in different folders, add directories individually.')
+        self.description2_label.config(font=("Times", 12))
+        self.description2_label.place(x=20, y=310)
+
+        # Add and position buttons to window
         add_button = Button(win, text='Add Directory', command=self.add)
         delete_button = Button(win, text='Delete Directory', command=self.delete)
+        parent_button = Button(win, text='Add Parent Directory') # Needs a command!
         next_button = Button(win, text='Continue', command=self.next)
 
-        # The buttons with images were cute, but not necessary.
+        # See to do above
         # add_button.image = plus_button_img
         # delete_button.image = delete_button_img
         # next_button.image = next_button_img
 
-        add_button.place(x=(1200 - background_width) / 2 + 850, y=500)
-        delete_button.place(x=(1200 - background_width) / 2 + 905, y=500)
-        next_button.place(x=1100, y=700)
+        add_button.place(x=20, y=450)
+        delete_button.place(x=110, y=450)
+        parent_button.place(x=20, y=280)
+        next_button.place(x=475, y=460)
 
         self.folders_var = StringVar()
-        self.lb_frame = Frame(win, width=background_width, height=background_height)
-        self.lb_frame.place(x=(1200 - background_width) / 2, y=500)
+        self.lb_frame = Frame(win, width=400, height=40)
+        self.lb_frame.place(x=20, y=340)
         self.listbox = Listbox(self.lb_frame,
                                listvariable=self.folders_var,
                                width=80,
@@ -73,7 +85,12 @@ class LoadingWindow:
         scrollbar.grid(column=1, row=0, sticky='ns')
 
     def add(self):
-        path = askdirectory(title='Select Folder')
+        path = askdirectory(title='Select Directory')
+        self.listbox.insert(self.listbox.size(), path)
+
+    # TODO: How do I grab all the files in the folder and add them for processing?
+    def add_parent(self):
+        path = askdirectory(title='Select Parent Directory')
         self.listbox.insert(self.listbox.size(), path)
 
     def delete(self):
