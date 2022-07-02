@@ -59,7 +59,8 @@ class ViewManager:
                               + ', '.join(incomplete_tracking_pairs))
                 StepsWindow(self.active_window, self)
 
-        self.active_window.title('FiloTracker')
+        #TODO: Move the geometry attribute to the if-else statements so it changes depending on the window.
+        self.active_window.title('TrackAssist3D')
         self.active_window.geometry("1200x800+50+50")
         self.active_window.mainloop()
 

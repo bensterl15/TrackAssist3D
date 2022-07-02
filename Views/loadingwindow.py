@@ -3,8 +3,7 @@ from tkinter.filedialog import askdirectory
 from PIL import ImageTk, Image
 
 # Import the constants we need:
-from Model.constants_and_paths import LOADING_WINDOW_BACKGROUND_PATH, \
-    PLUS_BUTTON_PATH, MINUS_BUTTON_PATH, NEXT_BUTTON_PATH
+from Model.constants_and_paths import LOADING_WINDOW_BACKGROUND_PATH
 
 
 class LoadingWindow:
@@ -20,19 +19,6 @@ class LoadingWindow:
         background_load = background_load.resize(
             (background_width, background_height), Image.ANTIALIAS)
         background_img = ImageTk.PhotoImage(background_load)
-
-
-        # TODO: Decide whether or not to delete this entirely (probably)
-        # button_width = 50
-        # plus_button_load = Image.open(PLUS_BUTTON_PATH)
-        # delete_button_load = Image.open(MINUS_BUTTON_PATH)
-        # next_button_load = Image.open(NEXT_BUTTON_PATH)
-        # plus_button_load = plus_button_load.resize((button_width, button_width), Image.ANTIALIAS)
-        # delete_button_load = delete_button_load.resize((button_width, button_width), Image.ANTIALIAS)
-        # next_button_load = next_button_load.resize((button_width, button_width), Image.ANTIALIAS)
-        # plus_button_img = ImageTk.PhotoImage(plus_button_load)
-        # delete_button_img = ImageTk.PhotoImage(delete_button_load)
-        # next_button_img = ImageTk.PhotoImage(next_button_load)
 
         # Add and position background to window
         self.background = Label(win, image=background_img)
@@ -60,11 +46,6 @@ class LoadingWindow:
         delete_button = Button(win, text='Delete Directory', command=self.delete)
         parent_button = Button(win, text='Add Parent Directory') # Needs a command!
         next_button = Button(win, text='Continue', command=self.next)
-
-        # See to do above
-        # add_button.image = plus_button_img
-        # delete_button.image = delete_button_img
-        # next_button.image = next_button_img
 
         add_button.place(x=20, y=450)
         delete_button.place(x=110, y=450)
