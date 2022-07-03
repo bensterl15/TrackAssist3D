@@ -15,7 +15,7 @@ class LoadingWindow:
         # Initialize background variables
         background_load = Image.open(LOADING_WINDOW_BACKGROUND_PATH)
         background_width = 550
-        background_height = 125
+        background_height = 130
         background_load = background_load.resize(
             (background_width, background_height), Image.ANTIALIAS)
         background_img = ImageTk.PhotoImage(background_load)
@@ -28,7 +28,7 @@ class LoadingWindow:
         # Add and position welcome message to window
         self.welcome_label = Label(win, text='Welcome to TrackAssist3D')
         self.welcome_label.config(font=("Times", 14, "bold italic"))
-        self.welcome_label.place(x=170, y=130)
+        self.welcome_label.place(x=170, y=135)
 
         # Add and position directions to window
         self.description1_label = Label(win,

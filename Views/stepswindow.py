@@ -1,4 +1,4 @@
-from tkinter import Button, StringVar, OptionMenu
+from tkinter import Button, StringVar, OptionMenu, Label
 import numpy as np
 
 class StepsWindow:
@@ -30,20 +30,33 @@ class StepsWindow:
                                  )
 
         # Configure statistics and back buttons:
-        stats_button = Button(win, text='View statistics', command=self.stats_view_requested)
-        back_button = Button(win, text='Back To Start Screen', command=self.start_view_requested)
+        stats_button = Button(win, text='Generate Statistics', command=self.stats_view_requested)
+        back_button = Button(win, text='Return To Directory Selection', command=self.start_view_requested)
 
         # Protrusion removal controls placement
-        removal_dropdown_menu.place(x=600, y=200)
-        removal_button.place(x=700, y=200)
+        removal_dropdown_menu.place(x=30, y=60)
+        removal_button.place(x=100, y=60)
 
         # Tracking controls placement:
-        tracking_dropdown_menu.place(x=600, y=300)
-        tracking_button.place(x=700, y=300)
+        tracking_dropdown_menu.place(x=30, y=110)
+        tracking_button.place(x=110, y=110)
 
         # Statistics and back-button placement:
-        stats_button.place(x=600, y=400)
-        back_button.place(x=600, y=500)
+        stats_button.place(x=30, y=160)
+        back_button.place(x=30, y=210)
+
+        # Window title and directions
+        steps_label = Label(win, text='Main Menu', bg="#e0dfda", height=2, width=40)
+        # removal_label = Label(win, text='')
+        # tracking_label = Label(win, text='')
+        # stats_label = Label(win, text='')
+
+        # Configure labels
+        steps_label.config(font=('Times', 14, 'italic'))
+        # removal_label.config
+
+        # Position window title and directions
+        steps_label.place(x=0, y=0)
 
     def start_view_requested(self):
         self.view_manager.back_to_start()

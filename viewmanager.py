@@ -40,15 +40,20 @@ class ViewManager:
 
         if current_view == 'start':
             LoadingWindow(self.active_window, self)
+            self.active_window.geometry("1200x800+50+50")
         elif current_view == 'step':
             StepsWindow(self.active_window, self)
+            self.active_window.geometry("400x300")  #This can be safely changed!
         elif current_view == 'removal':
             RemoverWindow(self.active_window, self, base_directory=self.base_dirs[self.active_cell])
+            self.active_window.geometry("1200x800+50+50")
         elif current_view == 'tracking':
             PairingWindow(self.active_window, self, base_directory1=self.base_dirs[self.active_pair],
                           base_directory2=self.base_dirs[self.active_pair + 1])
+            self.active_window.geometry("1200x800+50+50")
         elif current_view == 'stats':
             incomplete_tracking_pairs = self.tracking_incomplete()
+            self.active_window.geometry("1200x800+50+50")
             if not incomplete_tracking_pairs:
                 StatisticsWindow(self.active_window, self)
             else:
@@ -58,10 +63,8 @@ class ViewManager:
                               'The following tracking has not been performed: '
                               + ', '.join(incomplete_tracking_pairs))
                 StepsWindow(self.active_window, self)
-
-        #TODO: Move the geometry attribute to the if-else statements so it changes depending on the window.
         self.active_window.title('TrackAssist3D')
-        self.active_window.geometry("1200x800+50+50")
+        # self.active_window.geometry("1200x800+50+50")
         self.active_window.mainloop()
 
     def change_to_step_view(self, directories):
