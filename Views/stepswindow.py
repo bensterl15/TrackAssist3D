@@ -34,29 +34,31 @@ class StepsWindow:
         back_button = Button(win, text='Return To Directory Selection', command=self.start_view_requested)
 
         # Protrusion removal controls placement
-        removal_dropdown_menu.place(x=30, y=60)
-        removal_button.place(x=100, y=60)
+        removal_dropdown_menu.place(x=310, y=60)
+        removal_button.place(x=15, y=60)
 
         # Tracking controls placement:
-        tracking_dropdown_menu.place(x=30, y=110)
-        tracking_button.place(x=110, y=110)
+        tracking_dropdown_menu.place(x=310, y=110)
+        tracking_button.place(x=15, y=110)
 
         # Statistics and back-button placement:
-        stats_button.place(x=30, y=160)
-        back_button.place(x=30, y=210)
+        stats_button.place(x=15, y=160)
+        back_button.place(x=15, y=210)
 
         # Window title and directions
         steps_label = Label(win, text='Main Menu', bg="#e0dfda", height=2, width=40)
-        # removal_label = Label(win, text='')
-        # tracking_label = Label(win, text='')
-        # stats_label = Label(win, text='')
+        remMenu_label = Label(win, text='Select a surface:')
+        trackMenu_label = Label(win, text='Select surfaces:')
 
         # Configure labels
         steps_label.config(font=('Times', 14, 'italic'))
-        # removal_label.config
+        remMenu_label.config(font=('Times', 12))
+        trackMenu_label.config(font=('Times', 12))
 
         # Position window title and directions
         steps_label.place(x=0, y=0)
+        remMenu_label.place(x=205, y=60)
+        trackMenu_label.place(x=205, y=110)
 
     def start_view_requested(self):
         self.view_manager.back_to_start()

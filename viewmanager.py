@@ -43,7 +43,7 @@ class ViewManager:
             self.active_window.geometry("1200x800+50+50")
         elif current_view == 'step':
             StepsWindow(self.active_window, self)
-            self.active_window.geometry("400x300")  #This can be safely changed!
+            self.active_window.geometry("400x250")  #This can be safely changed!
         elif current_view == 'removal':
             RemoverWindow(self.active_window, self, base_directory=self.base_dirs[self.active_cell])
             self.active_window.geometry("1200x800+50+50")
