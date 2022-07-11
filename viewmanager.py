@@ -26,7 +26,7 @@ class ViewManager:
         self.min_index = 0
 
         self.active_window.title('TrackAssist3D')
-        self.active_window.geometry("550x500")
+        self.active_window.geometry("550x600")
         self.active_window.mainloop()
 
 
@@ -40,10 +40,10 @@ class ViewManager:
 
         if current_view == 'start':
             LoadingWindow(self.active_window, self)
-            self.active_window.geometry("1200x800+50+50")
+            self.active_window.geometry("550x600")
         elif current_view == 'step':
             StepsWindow(self.active_window, self)
-            self.active_window.geometry("400x250")  #This can be safely changed!
+            self.active_window.geometry("400x250")
         elif current_view == 'removal':
             RemoverWindow(self.active_window, self, base_directory=self.base_dirs[self.active_cell])
             self.active_window.geometry("1200x800+50+50")
