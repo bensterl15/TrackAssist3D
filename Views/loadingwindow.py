@@ -1,6 +1,7 @@
-from tkinter import Button, Label, StringVar, Frame, Listbox, Scrollbar, messagebox, Checkbutton, BooleanVar
+from tkinter import Button, Label, StringVar, Frame, Listbox, Scrollbar, messagebox, Checkbutton, IntVar, Tk
 from tkinter.filedialog import askdirectory
 from PIL import ImageTk, Image
+from os import listdir
 
 # Import the constants we need:
 from Model.constants_and_paths import LOADING_WINDOW_BACKGROUND_PATH
@@ -31,10 +32,11 @@ class LoadingWindow:
         self.welcome_label.place(x=170, y=135)
 
         self.namingConven_label = Label(win,
-            text='Please name all u-shape3D project folders IN ORDER using the guide below\nbefore proceeding:'
-                 '\nFor 2-9 folders: s1, s2, s3, etc.'
-                 '\nFor 10-99 folders: s01, s02, s03, etc.'
-                 '\nFor 100-999 folders: s001, s002, s003, etc.',
+                                        text='Please name all u-shape3D project folders IN ORDER using the guide below'
+                                        '\nbefore proceeding:'
+                                        '\nFor 2-9 folders: s1, s2, s3, etc.'
+                                        '\nFor 10-99 folders: s01, s02, s03, etc.'
+                                        '\nFor 100-999 folders: s001, s002, s003, etc.',
                                         justify='left',
                                         bg='#ff8a82',
                                         width=56,
@@ -47,27 +49,23 @@ class LoadingWindow:
         self.boxDirections_label.place(x=20, y=260)
 
         self.description1_label = Label(win,
-            text='If all u-shape3D project folders are in one directory, add it here.')
+                                        text='If all u-shape3D project folders are in one directory, add it here.')
         self.description1_label.config(font=("Times", 12))
         self.description1_label.place(x=20, y=340)
 
         self.description2_label = Label(win,
-            text='If u-shape3D project folders are in different directories, add them here.')
+                                        text='If u-shape3D project folders are in separate directories, add them here.')
         self.description2_label.config(font=("Times", 12))
         self.description2_label.place(x=20, y=415)
 
         # Add checkboxes to indicate where to look for project folders.
-        par_direct = BooleanVar()
-        indiv_direct = BooleanVar()
+        self.par_direct = IntVar()
+        self.indiv_direct = IntVar()
         self.par_checkbox = Checkbutton(win, text='All u-shape3D project folders are in one directory.',
-                                        variable=par_direct,
-                                        onvalue=True,
-                                        offvalue=False)
+                                        variable=self.par_direct)
         self.indiv_checkbox = Checkbutton(win,
                                           text='One or more u-shape3D project folders are in different directories.',
-                                          variable=indiv_direct,
-                                          onvalue=True,
-                                          offvalue=False)
+                                          variable=self.indiv_direct)
         self.par_checkbox.place(x=20, y=285)
         self.indiv_checkbox.place(x=20, y=305)
 
@@ -89,7 +87,7 @@ class LoadingWindow:
         self.par_frame = Frame(win, width=400, height=10)
         self.par_frame.place(x=20, y=360)
         self.listbox1 = Listbox(self.par_frame,
-                                listvariable=self.parFolder_var,
+                                listvariable=self.parFolders_var,
                                 width=80,
                                 height=1,
                                 selectmode='extended')
@@ -100,29 +98,69 @@ class LoadingWindow:
         self.lb_frame = Frame(win, width=400, height=40)
         self.lb_frame.place(x=20, y=445)
         self.listbox2 = Listbox(self.lb_frame,
-                               listvariable=self.indivFolders_var,
-                               width=80,
-                               height=6,
-                               selectmode='extended')
+                                listvariable=self.indivFolders_var,
+                                width=80,
+                                height=6,
+                                selectmode='extended')
         self.listbox2.grid(column=0, row=0, sticky='nwes')
         scrollbar = Scrollbar(self.lb_frame, orient='vertical', command=self.listbox2.yview)
         self.listbox2['yscrollcommand'] = scrollbar.set
         scrollbar.grid(column=1, row=0, sticky='ns')
 
-    # Add an individual directory.
+    # Add an individual directory, and assign it to the directory variable.
     def add_indiv(self):
         path = askdirectory(title='Select Directory')
         self.listbox2.insert(self.listbox2.size(), path)
 
-    # Add a super directory.
+    # Add a super directory, and add the subdirectories to the directory variable.
     def add_super(self):
         path = askdirectory(title='Select Super-Directory')
         self.listbox1.insert(self.listbox1.size(), path)
-    # The user should be able to only add one parent directory (add to the checks in the next method).
-    # The naming conventions should be dependent on the total number of projects:
-        # If there are less than 9, s1, s2, s3, ...
-        # If there are more than 10 but less than 100, s01, s02, s03, s04, ...
-        # Add checks to examine folder names and correct mistakes automatically?
+
+        # Show a list of the folders found in the super directory for confirmation.
+        preview = Tk()
+        preview.title('Subdirectories Preview')
+        preview.geometry('500x300')
+
+        # Directions to the user to check if all the desired files were found.
+        preview.check_files_label = Label(preview,
+                                          text='The following files were found in the super directory.\n'
+                                               'If all the files you wish to process are present, click Continue.')
+        preview.check_files_label.config(font=('Times', 14))
+        preview.check_files_label.place(x=20, y=15)
+
+        # Create a frame and listbox to display the subdirectories.
+        preview.subFolders_var = StringVar()
+        preview.sub_frame = Frame(preview, width='400', height='40')
+        preview.sub_frame.place(x=30, y=80)
+        preview.sub_listbox = Listbox(preview.sub_frame,
+                                      listvariable=preview.subFolders_var,
+                                      width=70,
+                                      height=10,
+                                      selectmode='extended')
+        preview.sub_listbox.grid(column=0, row=0, sticky='nwes')
+        sub_scrollbar = Scrollbar(preview.sub_frame, orient='vertical', command=preview.sub_listbox.yview)
+        preview.sub_listbox['yscrollcommand'] = sub_scrollbar.set
+        sub_scrollbar.grid(column=1, row=0, sticky='ns')
+
+        # Add the subdirectories to the listbox.
+        self.dirs_found = self.grab_subdirectories()
+        for folder in self.dirs_found:
+            preview.sub_listbox.insert(preview.sub_listbox.size(), folder)
+
+        # Create and place buttons to continue or go back.
+        continue_button = Button(preview, text='Continue', command=self.next)
+        back_button = Button(preview, text='Return to Directory Selection', command=preview.destroy)
+        continue_button.place(x=410, y=255)
+        back_button.place(x=30, y=255)
+
+    # Grab subdirectories from the super directory and add them to the preview window.
+    def grab_subdirectories(self):
+        root = self.parFolders_var.get()[2:-3]
+        sub_list = listdir(root)
+        for i in sub_list:
+            sub_list[sub_list.index(i)] = root + '/' + sub_list[sub_list.index(i)]
+        return sub_list
 
     # Delete an individual directory.
     def delete_indiv(self):
@@ -140,44 +178,89 @@ class LoadingWindow:
 
     # Move on to the steps window if appropriate conditions are met.
     def next(self):
-        directories = ()
-        # Use nested if statements. Might be good to add a checkbox for the option used. If individual files, only
-        # proceed if there are at least 2 directories. If parent directory, get all the folders and proceed if there
-        # are at least 2. There should only be one parent directory added.
+        # Make window showing all the directories found in the super directory
+        # Use that listbox to grab individual files
+        # Use the same code for super and individual directories.
+        choice_check = True  # Validates that only one checkbox was checked.
+        dir_check = True
 
-        #if self.par_checkbox.getboolean(self) == False and self.indiv_checkbox.getboolean(self) == False:
-            #messagebox.showerror('Error', 'Folder selection method was not specified. Please select a box indicating
-                #your folder selection method.')
+        if self.par_direct.get() == 0 and self.indiv_direct.get() == 0:
+            choice_check = False
+            messagebox.showerror('Error', 'Folder selection method was not specified. Please select a box indicating '
+                                          'your folder selection method.')
 
-        #elif self.par_checkbox.getboolean(self):
-            #directories_var = self.parFolder_var.get()
-            #for this path and below, process directories. Just for parent, find a way to access folders within the one entered.
+        elif self.par_direct.get() == 1 and self.indiv_direct.get() == 0:
+            dir_var = self.dirs_found
 
-        #elif self.indiv_checkbox.getBoolean(self):
-            #directories_var = self.indivFolders_var.get()
+        elif self.indiv_direct.get() == 1 and self.par_direct.get() == 0:
+            dir_var = self.indivFolders_var.get()
+            if len(dir_var) < 2:
+                messagebox.showerror('Error', 'At least 2 directories are needed to proceed. Less than 2 were found.')
+                dir_check = False
 
-        #elif self.par_checkbox.getboolean(self) and self.indiv_checkbox.getboolean(self):
-            #messagebox.showerror('Error', 'Both directory options are checked. Please select one folder selection
-                #method.')
-
-        directories_var = self.indivFolders_var.get()
-        b_proceed = True
-        if len(directories_var) > 0:
-            # Process the directories-list string
-            directories = tuple(map(str, directories_var
-                                    .replace('(', '')
-                                    .replace(')', '')
-                                    .replace('\'', '')
-                                    .split(', ')))
-
-            if len(directories) < 2:
-                # If we have less than 2 directories, do not proceed:
-                b_proceed = False
-        else:
-            # If the user does not enter anything, do not proceed:
-            b_proceed = False
-
-        if b_proceed:
+        elif self.par_direct.get() == 1 and self.indiv_direct.get() == 1:
+            choice_check = False
+            messagebox.showerror('Error', 'Both directory options are checked. Please select one folder selection '
+                                          'method.')
+        if choice_check and dir_check:
+            directories = self.process_and_continue(dir_var)
             self.view_manager.change_to_step_view(directories)
+
+    # Process the list of directories and move onto the steps window.
+    def process_and_continue(self, dir_var):  # THIS STILL AIN'T WORKING
+        directories = []
+        illegal = [')', '(', '\\''']
+        for file in dir_var:
+            for char in illegal:
+                if file.find(char) != -1:
+                    messagebox.showerror('Error', 'An illegal character was found in a directory. If any paths contain'
+                                                  'parentheses or backslashes, rename the necessary folders and try '
+                                                  'again.')
+            directories.append(file)
+        directories = tuple(directories)
+
+        # directories = tuple(map(str, dir_var ...
+
+        if len(directories) < 2:
+            messagebox.showerror('Error', 'At least two directories are needed to proceed. Less than 2 were found.')
         else:
-            messagebox.showerror('Error', 'Something happened. Fuck if I know.')
+            return directories
+
+    # Check the order of the directories.
+    def order_directories(self, dir_list):
+        curr = 1
+        order = True
+        for i in dir_list:
+            if not i.endswith(str(curr)):
+                order = False
+                break
+            else:
+                curr += 1
+        return order
+
+    # Check for naming conventions (for this, just that the folder name is s###). Optimize.
+    def meets_conventions(self, directory_list):
+        self.conven_met = True
+        if len(directory_list) < 10:
+            for i in directory_list:
+                check = i[-1:-3]
+                if check[0] != 's' or not check[1].isnumeric():
+                    self.conven_met = False
+                    break
+        elif 10 <= len(directory_list) < 100:
+            for i in directory_list:
+                check = i[-1:-4]
+                for i in directory_list:
+                    check = i[-1:-4]
+                    if check[0] != 's' or not check[1:3].isnumeric():
+                        self.conven_met = False
+                        break
+        elif len(directory_list) < 1000:
+            for i in directory_list:
+                check = i[-1:-5]
+                for i in directory_list:
+                    check = i[-1:-5]
+                    if check[0] != 's' or not check[1:4].isnumeric():
+                        self.conven_met = False
+                        break
+        return self.conven_met

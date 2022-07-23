@@ -64,7 +64,6 @@ class ViewManager:
                               + ', '.join(incomplete_tracking_pairs))
                 StepsWindow(self.active_window, self)
         self.active_window.title('TrackAssist3D')
-        # self.active_window.geometry("1200x800+50+50")
         self.active_window.mainloop()
 
     def change_to_step_view(self, directories):
