@@ -1,4 +1,4 @@
-from tkinter import Button, Label, StringVar, Frame, Listbox, Scrollbar, messagebox, Checkbutton, IntVar, Tk
+from tkinter import Button, Label, StringVar, Frame, Listbox, Scrollbar, messagebox, Checkbutton, IntVar, Tk, END
 from tkinter.filedialog import askdirectory
 from PIL import ImageTk, Image
 from os import listdir
@@ -17,7 +17,7 @@ class LoadingWindow:
 
         # Initialize background variables
         background_load = Image.open(LOADING_WINDOW_BACKGROUND_PATH)
-        background_width = 550
+        background_width = 650
         background_height = 130
         background_load = background_load.resize(
             (background_width, background_height), Image.ANTIALIAS)
@@ -43,9 +43,11 @@ class LoadingWindow:
         self.namingConven_label.config(font=('Times', 12))
         self.namingConven_label.place(x=20, y=158)
 
+        """
         self.boxDirections_label = Label(win, text='Indicate the location of the u-shape3D projects to be analyzed:')
         self.boxDirections_label.config(font=('Times', 12))
         self.boxDirections_label.place(x=20, y=260)
+        """
 
         self.description1_label = Label(win,
                                         text='If all u-shape3D project folders are in one directory, add it here.')
@@ -58,6 +60,7 @@ class LoadingWindow:
         self.description2_label.place(x=20, y=415)
 
         # Add checkboxes to indicate where to look for project folders.
+        """
         self.par_direct = IntVar()
         self.indiv_direct = IntVar()
         self.par_checkbox = Checkbutton(win, text='All u-shape3D project folders are in one directory.',
@@ -67,18 +70,20 @@ class LoadingWindow:
                                           variable=self.indiv_direct)
         self.par_checkbox.place(x=20, y=285)
         self.indiv_checkbox.place(x=20, y=305)
+        """
 
         # Add and position buttons to window
         add_indiv_button = Button(win, text='Add Directory', command=self.add_indiv)
         delete_indiv_button = Button(win, text='Delete Directory', command=self.delete_indiv)
         add_super_button = Button(win, text='Add Super Directory', command=self.add_super)
-        delete_super_button = Button(win, text='Delete Super Directory', command=self.delete_super)
+        # We do not need this button:
+        #delete_super_button = Button(win, text='Delete Super Directory', command=self.delete_super)
         next_button = Button(win, text='Continue', command=self.next)
 
         add_indiv_button.place(x=20, y=555)
         delete_indiv_button.place(x=110, y=555)
         add_super_button.place(x=20, y=385)
-        delete_super_button.place(x=145, y=385)
+        #delete_super_button.place(x=145, y=385)
         next_button.place(x=475, y=560)
 
         # Create the list box for the super directory.
@@ -87,18 +92,18 @@ class LoadingWindow:
         self.par_frame.place(x=20, y=360)
         self.listbox1 = Listbox(self.par_frame,
                                 listvariable=self.parFolders_var,
-                                width=80,
+                                width=100,
                                 height=1,
                                 selectmode='extended')
         self.listbox1.grid(column=0, row=0, sticky='nwes')
 
         # Create the list box for directories added individually.
         self.indivFolders_var = StringVar()
-        self.lb_frame = Frame(win, width=400, height=40)
+        self.lb_frame = Frame(win, width=500, height=40)
         self.lb_frame.place(x=20, y=445)
         self.listbox2 = Listbox(self.lb_frame,
                                 listvariable=self.indivFolders_var,
-                                width=80,
+                                width=100,
                                 height=6,
                                 selectmode='extended')
         self.listbox2.grid(column=0, row=0, sticky='nwes')
@@ -113,51 +118,63 @@ class LoadingWindow:
 
     # Add a super directory, and add the subdirectories to the directory variable.
     def add_super(self):
+        self.listbox1.delete(0, END)
+        self.listbox2.delete(0, END)
         path = askdirectory(title='Select Super-Directory')
         self.listbox1.insert(self.listbox1.size(), path)
 
         # Show a list of the folders found in the super directory for confirmation.
-        preview = Tk()
-        preview.title('Subdirectories Preview')
-        preview.geometry('700x300')
+        self.preview = Tk()
+        self.preview.title('Subdirectories Preview')
+        self.preview.geometry('700x300')
 
         # Directions to the user to check if all the desired files were found.
-        preview.check_files_label = Label(preview,
+        self.preview.check_files_label = Label(self.preview,
                                           text='The following files were found in the super directory.\n'
                                                'If all the files you wish to process are present, click Continue.')
-        preview.check_files_label.config(font=('Times', 14))
-        preview.check_files_label.place(x=20, y=15)
+        self.preview.check_files_label.config(font=('Times', 14))
+        self.preview.check_files_label.place(x=20, y=15)
 
         # Create a frame and listbox to display the subdirectories.
-        preview.subFolders_var = StringVar()
-        preview.sub_frame = Frame(preview, width='600', height='40')
-        preview.sub_frame.place(x=30, y=80)
-        preview.sub_listbox = Listbox(preview.sub_frame,
-                                      listvariable=preview.subFolders_var,
+        self.preview.subFolders_var = StringVar()
+        self.preview.sub_frame = Frame(self.preview, width='600', height='40')
+        self.preview.sub_frame.place(x=30, y=80)
+        self.preview.sub_listbox = Listbox(self.preview.sub_frame,
+                                      listvariable=self.preview.subFolders_var,
                                       width=100,
                                       height=10,
                                       selectmode='extended')
-        preview.sub_listbox.grid(column=0, row=0, sticky='nwes')
-        sub_scrollbar = Scrollbar(preview.sub_frame, orient='vertical', command=preview.sub_listbox.yview)
-        preview.sub_listbox['yscrollcommand'] = sub_scrollbar.set
+        self.preview.sub_listbox.grid(column=0, row=0, sticky='nwes')
+        sub_scrollbar = Scrollbar(self.preview.sub_frame, orient='vertical', command=self.preview.sub_listbox.yview)
+        self.preview.sub_listbox['yscrollcommand'] = sub_scrollbar.set
         sub_scrollbar.grid(column=1, row=0, sticky='ns')
 
         # Add the subdirectories to the listbox.
-        self.dirs_found = self.grab_subdirectories()
-        for folder in self.dirs_found:
-            preview.sub_listbox.insert(preview.sub_listbox.size(), folder)
+        self.dirs_found_superdir = self.grab_subdirectories()
+        for folder in self.dirs_found_superdir:
+            self.preview.sub_listbox.insert(self.preview.sub_listbox.size(), folder)
 
         # Create and place buttons to continue or go back.
-        continue_button = Button(preview, text='Continue', command=self.next)
-        back_button = Button(preview, text='Return to Directory Selection', command=preview.destroy)
+        continue_button = Button(self.preview, text='Add to list', command=self.add_subdirectories_to_grand_list)
+        back_button = Button(self.preview, text='Return to Directory Selection', command=self.preview.destroy)
         continue_button.place(x=410, y=255)
         back_button.place(x=30, y=255)
+
+    def add_subdirectories_to_grand_list(self):
+        for dir in self.dirs_found_superdir:
+            self.listbox2.insert(END, dir)
+
+        # Programmatically close the addition screen:
+        self.preview.destroy()
+
+        # After all directories from the super list are transferred to the grand list, clear the variable:
+        self.dirs_found_superdir = []
 
     # Grab subdirectories from the super directory and add them to the preview window.
     def grab_subdirectories(self):
         root = self.parFolders_var.get()[2:-3]
         sub_list = listdir(root)
-        sort_list = [int(re.sub("[A-Za-z_]", "", s)) for s in sub_list]
+        sort_list = [int(re.sub("[^0-9]", "", s)) for s in sub_list]
         sub_list = [x for _, x in sorted(zip(sort_list, sub_list))]
 
         for i in sub_list:
@@ -186,24 +203,11 @@ class LoadingWindow:
         choice_check = True  # Validates that only one checkbox was checked.
         dir_check = True
 
-        if self.par_direct.get() == 0 and self.indiv_direct.get() == 0:
-            choice_check = False
-            messagebox.showerror('Error', 'Folder selection method was not specified. Please select a box indicating '
-                                          'your folder selection method.')
+        dir_var = self.listbox2.get(0, END)#self.indivFolders_var.get()
+        if len(dir_var) < 2:
+            messagebox.showerror('Error', 'At least 2 directories are needed to proceed. Less than 2 were found.')
+            dir_check = False
 
-        elif self.par_direct.get() == 1 and self.indiv_direct.get() == 0:
-            dir_var = self.dirs_found
-
-        elif self.indiv_direct.get() == 1 and self.par_direct.get() == 0:
-            dir_var = self.indivFolders_var.get()
-            if len(dir_var) < 2:
-                messagebox.showerror('Error', 'At least 2 directories are needed to proceed. Less than 2 were found.')
-                dir_check = False
-
-        elif self.par_direct.get() == 1 and self.indiv_direct.get() == 1:
-            choice_check = False
-            messagebox.showerror('Error', 'Both directory options are checked. Please select one folder selection '
-                                          'method.')
         if choice_check and dir_check:
             directories = self.process_and_continue(dir_var)
             self.view_manager.change_to_step_view(directories)

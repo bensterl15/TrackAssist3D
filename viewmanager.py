@@ -26,7 +26,7 @@ class ViewManager:
         self.min_index = 0
 
         self.active_window.title('TrackAssist3D')
-        self.active_window.geometry("550x600")
+        self.active_window.geometry("650x600")
         self.active_window.mainloop()
 
 
