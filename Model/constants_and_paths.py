@@ -24,7 +24,7 @@ VALID_USHAPE3D_DIR_ERROR_MSG = 'Please ensure all directories are valid u-shape3
 MAX_PROTRUSIONS_INDEX = 1e8
 
 if DEBUG:
-    ROOT_STR = "C:\\Users\\jewel\\Desktop\\Project Files\\FiloTracker\\"
+    ROOT_STR = "C:\\Users\\bsterling\\PycharmProjects\\FiloTracker\\"
     PAIRING_WINDOW_BACKGROUND_PATH = ROOT_STR + "TA3D_Logo.PNG"
     REMOVER_WINDOW_BACKGROUND_PATH = PAIRING_WINDOW_BACKGROUND_PATH
     LOADING_WINDOW_BACKGROUND_PATH = PAIRING_WINDOW_BACKGROUND_PATH

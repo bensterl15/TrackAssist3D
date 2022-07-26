@@ -3,6 +3,8 @@ from tkinter.filedialog import askdirectory
 from PIL import ImageTk, Image
 from os import listdir
 
+import re
+
 # Import the constants we need:
 from Model.constants_and_paths import LOADING_WINDOW_BACKGROUND_PATH
 
@@ -32,11 +34,8 @@ class LoadingWindow:
         self.welcome_label.place(x=170, y=135)
 
         self.namingConven_label = Label(win,
-                                        text='Please name all u-shape3D project folders IN ORDER using the guide below'
-                                        '\nbefore proceeding:'
-                                        '\nFor 2-9 folders: s1, s2, s3, etc.'
-                                        '\nFor 10-99 folders: s01, s02, s03, etc.'
-                                        '\nFor 100-999 folders: s001, s002, s003, etc.',
+                                        text='Please make sure your folders contain frame number inside of their name.'
+                                        '\nFor example the 10th frame could be named: surface10',
                                         justify='left',
                                         bg='#ff8a82',
                                         width=56,
@@ -120,7 +119,7 @@ class LoadingWindow:
         # Show a list of the folders found in the super directory for confirmation.
         preview = Tk()
         preview.title('Subdirectories Preview')
-        preview.geometry('500x300')
+        preview.geometry('700x300')
 
         # Directions to the user to check if all the desired files were found.
         preview.check_files_label = Label(preview,
@@ -131,11 +130,11 @@ class LoadingWindow:
 
         # Create a frame and listbox to display the subdirectories.
         preview.subFolders_var = StringVar()
-        preview.sub_frame = Frame(preview, width='400', height='40')
+        preview.sub_frame = Frame(preview, width='600', height='40')
         preview.sub_frame.place(x=30, y=80)
         preview.sub_listbox = Listbox(preview.sub_frame,
                                       listvariable=preview.subFolders_var,
-                                      width=70,
+                                      width=100,
                                       height=10,
                                       selectmode='extended')
         preview.sub_listbox.grid(column=0, row=0, sticky='nwes')
@@ -158,6 +157,9 @@ class LoadingWindow:
     def grab_subdirectories(self):
         root = self.parFolders_var.get()[2:-3]
         sub_list = listdir(root)
+        sort_list = [int(re.sub("[A-Za-z_]", "", s)) for s in sub_list]
+        sub_list = [x for _, x in sorted(zip(sort_list, sub_list))]
+
         for i in sub_list:
             sub_list[sub_list.index(i)] = root + '/' + sub_list[sub_list.index(i)]
         return sub_list
