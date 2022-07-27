@@ -10,6 +10,7 @@ from Model.constants_and_paths import LOADING_WINDOW_BACKGROUND_PATH
 class LoadingWindow:
 
     def __init__(self, win, view_manager):
+        self.subdirectories = None
         self.win = win
         self.view_manager = view_manager
 
@@ -107,12 +108,7 @@ class LoadingWindow:
         self.listbox2['yscrollcommand'] = scrollbar.set
         scrollbar.grid(column=1, row=0, sticky='ns')
 
-    # Add an individual directory, and assign it to the directory variable.
-    def add_indiv(self):
-        path = askdirectory(title='Select Directory')
-        self.listbox2.insert(self.listbox2.size(), path)
-
-    # Add a super directory, and add the subdirectories to the directory variable.
+    # Add a super directory, and add the subdirectories to the preview window listbox.
     def add_super(self):
         path = askdirectory(title='Select Super-Directory')
         self.listbox1.insert(self.listbox1.size(), path)
@@ -144,8 +140,8 @@ class LoadingWindow:
         sub_scrollbar.grid(column=1, row=0, sticky='ns')
 
         # Add the subdirectories to the listbox.
-        self.dirs_found = self.grab_subdirectories()
-        for folder in self.dirs_found:
+        self.subdirectories = self.grab_subdirectories()
+        for folder in self.subdirectories:
             preview.sub_listbox.insert(preview.sub_listbox.size(), folder)
 
         # Create and place buttons to continue or go back.
@@ -161,6 +157,11 @@ class LoadingWindow:
         for i in sub_list:
             sub_list[sub_list.index(i)] = root + '/' + sub_list[sub_list.index(i)]
         return sub_list
+
+    # Add an individual directory, and add it to the individual directories listbox.
+    def add_indiv(self):
+        path = askdirectory(title='Select Directory')
+        self.listbox2.insert(self.listbox2.size(), path)
 
     # Delete an individual directory.
     def delete_indiv(self):
@@ -178,53 +179,56 @@ class LoadingWindow:
 
     # Move on to the steps window if appropriate conditions are met.
     def next(self):
-        # Make window showing all the directories found in the super directory
-        # Use that listbox to grab individual files
-        # Use the same code for super and individual directories.
         choice_check = True  # Validates that only one checkbox was checked.
-        dir_check = True
 
         if self.par_direct.get() == 0 and self.indiv_direct.get() == 0:
             choice_check = False
+            dir_var = []
             messagebox.showerror('Error', 'Folder selection method was not specified. Please select a box indicating '
                                           'your folder selection method.')
 
         elif self.par_direct.get() == 1 and self.indiv_direct.get() == 0:
-            dir_var = self.dirs_found
+            dir_var = self.subdirectories
 
         elif self.indiv_direct.get() == 1 and self.par_direct.get() == 0:
             dir_var = self.indivFolders_var.get()
-            if len(dir_var) < 2:
-                messagebox.showerror('Error', 'At least 2 directories are needed to proceed. Less than 2 were found.')
-                dir_check = False
 
-        elif self.par_direct.get() == 1 and self.indiv_direct.get() == 1:
+        else:  # Both of the boxes are checked.
             choice_check = False
+            dir_var = []
             messagebox.showerror('Error', 'Both directory options are checked. Please select one folder selection '
                                           'method.')
-        if choice_check and dir_check:
-            directories = self.process_and_continue(dir_var)
-            self.view_manager.change_to_step_view(directories)
+        if dir_var:
+            if choice_check:
+                directories, good_check = self.process_and_continue(dir_var)
+                if len(directories) == 0 or not good_check:
+                    pass
+                elif len(directories) >= 2:
+                    self.view_manager.change_to_step_view(directories)
+        else:
+            messagebox.showerror('Error', 'No directories were found. If you are using a super directory, make sure '
+                                          'the folder is not empty. If you are using individual directories, make sure '
+                                          'all of them are present in the list before proceeding.')
 
-    # Process the list of directories and move onto the steps window.
-    def process_and_continue(self, dir_var):  # THIS STILL AIN'T WORKING
+    # Process the list of directories, check for illegal characters, and pass the directories to the next method.
+    def process_and_continue(self, dir_var):
         directories = []
         illegal = [')', '(', '\\''']
+        good_check = True
         for file in dir_var:
             for char in illegal:
                 if file.find(char) != -1:
                     messagebox.showerror('Error', 'An illegal character was found in a directory. If any paths contain'
                                                   'parentheses or backslashes, rename the necessary folders and try '
                                                   'again.')
+                    good_check = False
+                    break
             directories.append(file)
-        directories = tuple(directories)
-
-        # directories = tuple(map(str, dir_var ...
-
-        if len(directories) < 2:
+        if good_check and len(directories) >= 2:
+            directories = tuple(directories)
+        elif len(directories) > 2:
             messagebox.showerror('Error', 'At least two directories are needed to proceed. Less than 2 were found.')
-        else:
-            return directories
+        return directories, good_check
 
     # Check the order of the directories.
     def order_directories(self, dir_list):

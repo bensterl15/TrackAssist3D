@@ -23,25 +23,26 @@ class StatisticsWindow:
         self.view_manager = view_manager
 
         background_load = Image.open(LOADING_WINDOW_BACKGROUND_PATH)
-        background_width = 800
-        background_height = 300
+        background_width = 400
+        background_height = 100
         background_load = background_load.resize(
             (background_width, background_height), Image.ANTIALIAS)
         background_img = ImageTk.PhotoImage(background_load)
 
         self.background = Label(win, image=background_img)
         self.background.image = background_img
-        self.background.place(
-            x=(1200 - background_width) / 2, y=50
-        )
+        self.background.place(x=0, y=0)
 
         generate_report_button = Button(win,
                                         text='Generate Report',
-                                        command=self.generate_report)
-        generate_report_button.place(x=600, y=500)
+                                        command=self.generate_report,
+                                        bg='grey',
+                                        padx=10,
+                                        pady=5)
+        generate_report_button.place(x=170, y=120)
 
-        back_button = Button(win, text='Back To Steps Screen', command=self.back_requested)
-        back_button.place(x=100, y=100)
+        back_button = Button(win, text='Return To Options Menu', command=self.back_requested)
+        back_button.place(x=100, y=160)
 
         self._init_chains()
 
