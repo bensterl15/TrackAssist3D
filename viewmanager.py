@@ -40,7 +40,7 @@ class ViewManager:
 
         if current_view == 'start':
             LoadingWindow(self.active_window, self)
-            self.active_window.geometry("550x600")
+            self.active_window.geometry("650x600")
         elif current_view == 'step':
             StepsWindow(self.active_window, self)
             self.active_window.geometry("400x250")

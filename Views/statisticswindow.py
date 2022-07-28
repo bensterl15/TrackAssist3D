@@ -39,10 +39,10 @@ class StatisticsWindow:
                                         bg='grey',
                                         padx=10,
                                         pady=5)
-        generate_report_button.place(x=170, y=120)
+        generate_report_button.place(x=145, y=115)
 
         back_button = Button(win, text='Return To Options Menu', command=self.back_requested)
-        back_button.place(x=100, y=160)
+        back_button.place(x=130, y=160)
 
         self._init_chains()
 
