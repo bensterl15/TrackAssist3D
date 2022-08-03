@@ -13,11 +13,13 @@ from Model.constants_and_paths import MESH_PATH_OFFSET, PAIRING_WINDOW_BACKGROUN
 
 sys.path.append(os.path.abspath(os.path.join('..', 'Model')))
 
+
 def rgb_to_hex(color_vector):
     red = f'{int(color_vector[0] * 255):02X}'
     green = f'{int(color_vector[1] * 255):02X}'
     blue = f'{int(color_vector[2] * 255):02X}'
     return '#' + red + green + blue
+
 
 class PairingWindow:
     '''The view for finding protrusion trajectories between two timepoints:'''
@@ -142,7 +144,7 @@ class PairingWindow:
         self.plotter.update_mesh2(button_index, value)
 
     def dropdown_changed(self, *_):
-        '''Method called when one of the dropdowns on-screen changed:'''
+        """Method called when one of the dropdowns on-screen changed:"""
         dropdown = 0
         value = ''
         detected_change = False
@@ -166,7 +168,7 @@ class PairingWindow:
     def next(self):
         if messagebox.askyesno(title='Confirmation',
                                message=
-                               'Are you sure you would like to proceed? Project will be overwritten'
+                               'Are you sure you would like to proceed? The project will be overwritten.'
                                ):
 
             # We only need one directory at this step, because only mesh 2 needs to change:
@@ -193,8 +195,8 @@ class PairingWindow:
     def _gui_setup(self):
         # Take care of all the GUI stuff:
         background_load = Image.open(PAIRING_WINDOW_BACKGROUND_PATH)
-        background_width = 800
-        background_height = 300
+        background_width = 405
+        background_height = 120
         background_load = background_load.resize(
             (background_width, background_height), Image.ANTIALIAS
         )
@@ -207,22 +209,26 @@ class PairingWindow:
 
         self.background = Label(self.win, image=background_img)
         self.background.image = background_img
-        self.background.place(x=(1200 - background_width) / 2, y=50)
+        self.background.place(x=-2, y=0)
 
-        self.description_label = Label(self.win, text='Select the best protrusion match:')
-        self.description_label.config(font=("Courier", 24))
-        self.description_label.place(x=(1200 - background_width) / 2, y=375)
+        self.title_label = Label(self.win, text='Protrusion Pair Tracking')
+        self.title_label.config(font=('Times', 14, 'italic'))
+        self.title_label.place(x=100, y=125)
 
-        self.next_button = Button(self.win, text='Next', command=self.next, image=next_button_img)
+        self.description_label = Label(self.win, text='Select the best protrusion matches below:')
+        self.description_label.config(font=('Times', 14))
+        self.description_label.place(x=35, y=170)
+
+        self.next_button = Button(self.win, text='Next', command=self.next)
         self.next_button.image = next_button_img
-        self.next_button.place(x=1100, y=700)
+        self.next_button.place(x=335, y=460)
 
-        back_button = Button(self.win, text='Back To Steps Screen', command=self.back_requested)
-        back_button.place(x=100, y=100)
+        back_button = Button(self.win, text='Return to Main Menu', command=self.back_requested)
+        back_button.place(x=35, y=460)
 
         ### First Checkbox window:
         lb_frame = Frame(self.win, width=background_width, height=background_height)
-        lb_frame.place(x=(1200 - background_width) / 2, y=500)
+        lb_frame.place(x=35, y=200)
 
         vsb = Scrollbar(lb_frame, orient="vertical")
         vsb_text = Text(lb_frame, width=40, height=15, yscrollcommand=vsb.set)
