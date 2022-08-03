@@ -63,8 +63,8 @@ class RemoverWindow:
 
         # Take care of all the GUI stuff:
         background_load = Image.open(REMOVER_WINDOW_BACKGROUND_PATH)
-        background_width = 800
-        background_height = 300
+        background_width = 405
+        background_height = 120
         background_load = background_load.resize(
             (background_width, background_height), Image.ANTIALIAS)
         background_img = ImageTk.PhotoImage(background_load)
@@ -82,21 +82,25 @@ class RemoverWindow:
 
         self.background = Label(win, image=background_img)
         self.background.image = background_img
-        self.background.place(x=(1200 - background_width) / 2, y=50)
+        self.background.place(x=-2, y=0)
 
-        self.description_label = Label(win, text='Select the protrusions to keep:')
-        self.description_label.config(font=("Courier", 24))
-        self.description_label.place(x=(1200 - background_width) / 2, y=375)
+        self.title_label = Label(win, text='Excess Protrusion Removal')
+        self.title_label.config(font=("Times", 14, 'italic'))
+        self.title_label.place(x=95, y=125)
 
-        self.next_button = Button(win, text='Next', command=self.next, image=next_button_img)
+        self.description_label = Label(win, text='Select the protrusions to keep below:')
+        self.description_label.config(font=("Times", 14))
+        self.description_label.place(x=35, y=170)
+
+        self.next_button = Button(win, text='Next', command=self.next)
         self.next_button.image = next_button_img
-        self.next_button.place(x=1100, y=700)
+        self.next_button.place(x=335, y=460)
 
-        back_button = Button(win, text='Back To Steps Screen', command=self.back_requested)
-        back_button.place(x=100, y=100)
+        back_button = Button(win, text='Return to Main Menu', command=self.back_requested)
+        back_button.place(x=35, y=460)
 
         self.lb_frame = Frame(win, width=background_width, height=background_height)
-        self.lb_frame.place(x=(1200 - background_width) / 2, y=500)
+        self.lb_frame.place(x=35, y=200)
 
         self.vsb = Scrollbar(self.lb_frame, orient="vertical")
         self.text = Text(self.lb_frame, width=40, height=15, yscrollcommand=self.vsb.set)
@@ -126,8 +130,8 @@ class RemoverWindow:
     def next(self):
         if messagebox.askyesno(
                 title='Confirmation',
-                message='Are you sure you would like to proceed? FiloTracker will overwrite'
-                        ' any contents it ran for this cell'):
+                message='Are you sure you would like to proceed? TrackAssist3D will overwrite'
+                        ' any contents it ran for this cell.'):
 
             removal_segment_dir = os.path.join(self.base_directory, REMOVAL_PATH_OFFSET)
             if not Path(removal_segment_dir).is_dir():

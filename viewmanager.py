@@ -1,4 +1,4 @@
-'''Import the necessary GUI modules:'''
+""" Import the necessary GUI modules: """
 import os.path
 from tkinter import Tk, messagebox
 from Views.removerwindow import RemoverWindow
@@ -8,6 +8,7 @@ from Views.stepswindow import StepsWindow
 from Views.statisticswindow import StatisticsWindow
 
 from Model.constants_and_paths import VALID_USHAPE3D_DIR_ERROR_MSG, ICON_PATH, TRACKING_PATH_OFFSET
+
 
 class ViewManager:
     """Class that manages the views (changes views etc etc)"""
@@ -29,7 +30,6 @@ class ViewManager:
         self.active_window.geometry("650x600")
         self.active_window.mainloop()
 
-
     def change_view(self, current_view):
         """Destroy current window and create a new one:"""
         self.active_window.destroy()
@@ -41,16 +41,20 @@ class ViewManager:
         if current_view == 'start':
             LoadingWindow(self.active_window, self)
             self.active_window.geometry("650x600")
+
         elif current_view == 'step':
             StepsWindow(self.active_window, self)
             self.active_window.geometry("400x250")
+
         elif current_view == 'removal':
             RemoverWindow(self.active_window, self, base_directory=self.base_dirs[self.active_cell])
-            self.active_window.geometry("1200x800+50+50")
+            self.active_window.geometry("400x500")
+
         elif current_view == 'tracking':
             PairingWindow(self.active_window, self, base_directory1=self.base_dirs[self.active_pair],
                           base_directory2=self.base_dirs[self.active_pair + 1])
             self.active_window.geometry("1200x800+50+50")
+
         elif current_view == 'stats':
             incomplete_tracking_pairs = self.tracking_incomplete()
             self.active_window.geometry("400x200")
@@ -63,6 +67,7 @@ class ViewManager:
                               'The following tracking has not been performed: '
                               + ', '.join(incomplete_tracking_pairs))
                 StepsWindow(self.active_window, self)
+
         self.active_window.title('TrackAssist3D')
         self.active_window.mainloop()
 
