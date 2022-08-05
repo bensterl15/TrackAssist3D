@@ -1,4 +1,4 @@
-from tkinter import Button, Label, StringVar, Frame, Listbox, Scrollbar, messagebox, Checkbutton, IntVar, Tk, END
+from tkinter import Button, Label, StringVar, Frame, Listbox, Scrollbar, messagebox, Tk, END
 from tkinter.filedialog import askdirectory
 from PIL import ImageTk, Image
 from os import listdir
@@ -16,7 +16,7 @@ class LoadingWindow:
         self.win = win
         self.view_manager = view_manager
 
-        # Initialize background variables
+        # Initialize background variables.
         background_load = Image.open(LOADING_WINDOW_BACKGROUND_PATH)
         background_width = 655
         background_height = 180
@@ -24,12 +24,12 @@ class LoadingWindow:
             (background_width, background_height), Image.ANTIALIAS)
         background_img = ImageTk.PhotoImage(background_load)
 
-        # Add and position background to window
+        # Add and position background to the window.
         self.background = Label(win, image=background_img)
         self.background.image = background_img
         self.background.place(x=-5, y=0)
 
-        # Add and position welcome message and directions to window
+        # Add and position welcome message and directions to the window.
         self.welcome_label = Label(win, text='Welcome to TrackAssist3D')
         self.welcome_label.config(font=("Times", 14, "bold italic"))
         self.welcome_label.place(x=210, y=190)
@@ -54,7 +54,7 @@ class LoadingWindow:
         self.description2_label.config(font=("Times", 12))
         self.description2_label.place(x=20, y=415)
 
-        # Add and position buttons to window
+        # Add and position buttons to the window.
         add_indiv_button = Button(win, text='Add Directory', command=self.add_indiv)
         delete_indiv_button = Button(win, text='Delete Directory', command=self.delete_indiv)
         add_super_button = Button(win, text='Add Super Directory', command=self.add_super)
@@ -97,49 +97,52 @@ class LoadingWindow:
         path = askdirectory(title='Select Super-Directory')
         self.listbox1.insert(self.listbox1.size(), path)
 
-        # Show a list of the folders found in the super directory for confirmation.
-        self.preview = Tk()
-        self.preview.title('Subdirectories Preview')
-        self.preview.geometry('650x300')
+        # Only continue if a super directory is selected:
+        if path != '' and listdir(path) != []:
+            # Show a list of the folders found in the super directory for confirmation.
+            self.preview = Tk()
+            self.preview.title('Subdirectories Preview')
+            self.preview.geometry('650x300')
 
-        # Directions to the user to check if all the desired files were found.
-        self.preview.check_files_label = Label(self.preview,
-                                               text='The following files were found in the super directory.\n'
-                                                    'Click "Add to List" if the files below appear correct.',
-                                               justify='center')
-        self.preview.check_files_label.config(font=('Times', 14))
-        self.preview.check_files_label.place(x=130, y=15)
+            # Directions to the user to check if all the desired files were found.
+            self.preview.check_files_label = Label(self.preview,
+                                                   text='The following files were found in the super directory.\n'
+                                                        'Click "Add to List" if the files below appear correct.',
+                                                   justify='center')
+            self.preview.check_files_label.config(font=('Times', 14))
+            self.preview.check_files_label.place(x=130, y=15)
 
-        # Create a frame and listbox to display the subdirectories.
-        self.preview.subFolders_var = StringVar()
-        self.preview.sub_frame = Frame(self.preview, width='600', height='40')
-        self.preview.sub_frame.place(x=15, y=80)
-        self.preview.sub_listbox = Listbox(self.preview.sub_frame,
-                                           listvariable=self.preview.subFolders_var,
-                                           width=100,
-                                           height=10,
-                                           selectmode='extended')
-        self.preview.sub_listbox.grid(column=0, row=0, sticky='nwes')
-        sub_scrollbar = Scrollbar(self.preview.sub_frame, orient='vertical', command=self.preview.sub_listbox.yview)
-        self.preview.sub_listbox['yscrollcommand'] = sub_scrollbar.set
-        sub_scrollbar.grid(column=1, row=0, sticky='ns')
+            # Create a frame and listbox to display the subdirectories.
+            self.preview.subFolders_var = StringVar()
+            self.preview.sub_frame = Frame(self.preview, width='600', height='40')
+            self.preview.sub_frame.place(x=15, y=80)
+            self.preview.sub_listbox = Listbox(self.preview.sub_frame,
+                                               listvariable=self.preview.subFolders_var,
+                                               width=100,
+                                               height=10,
+                                               selectmode='extended')
+            self.preview.sub_listbox.grid(column=0, row=0, sticky='nwes')
+            sub_scrollbar = Scrollbar(self.preview.sub_frame, orient='vertical', command=self.preview.sub_listbox.yview)
+            self.preview.sub_listbox['yscrollcommand'] = sub_scrollbar.set
+            sub_scrollbar.grid(column=1, row=0, sticky='ns')
 
-        # Add the subdirectories to the listbox.
-        self.dirs_found_superdir = self.grab_subdirectories()
-        for folder in self.dirs_found_superdir:
-            self.preview.sub_listbox.insert(self.preview.sub_listbox.size(), folder)
+            # Create and place buttons to continue or go back.
+            continue_button = Button(self.preview, text='Add to List', command=self.add_subdirectories_to_grand_list)
+            back_button = Button(self.preview, text='Return to Directory Selection', command=self.preview.destroy)
+            continue_button.place(x=565, y=255)
+            back_button.place(x=15, y=255)
 
-        # Create and place buttons to continue or go back.
-        continue_button = Button(self.preview, text='Add to List', command=self.add_subdirectories_to_grand_list)
-        back_button = Button(self.preview, text='Return to Directory Selection', command=self.preview.destroy)
-        continue_button.place(x=565, y=255)
-        back_button.place(x=15, y=255)
+            # Add the subdirectories to the listbox.
+            self.dirs_found_superdir = self.grab_subdirectories()
+            if len(self.dirs_found_superdir) > 0:
+                for folder in self.dirs_found_superdir:
+                    self.preview.sub_listbox.insert(self.preview.sub_listbox.size(), folder)
 
     def add_subdirectories_to_grand_list(self):
-        for dir in self.dirs_found_superdir:
-            self.listbox2.insert(END, dir)
+        for direct in self.dirs_found_superdir:
+            self.listbox2.insert(END, direct)
 
-        # Programmatically close the addition screen:
+        # Close the addition screen:
         self.preview.destroy()
 
         # After all directories from the super list are transferred to the grand list, clear the variable:

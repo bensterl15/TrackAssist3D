@@ -1,13 +1,12 @@
 import json
 import os
 from pathlib import Path
-from tkinter import Button, Label, StringVar, Frame, Listbox, Scrollbar, messagebox
+from tkinter import Button, Label, messagebox
 from tkinter.filedialog import asksaveasfile
 from PIL import ImageTk, Image
 
 # Import the constants we need:
-from Model.constants_and_paths import LOADING_WINDOW_BACKGROUND_PATH, \
-    PLUS_BUTTON_PATH, MINUS_BUTTON_PATH, NEXT_BUTTON_PATH, TRACKING_PATH_OFFSET, REMOVAL_PATH_OFFSET
+from Model.constants_and_paths import LOADING_WINDOW_BACKGROUND_PATH, TRACKING_PATH_OFFSET, REMOVAL_PATH_OFFSET
 
 from Model.mesh import Mesh
 from Model.chain import Chain
@@ -22,6 +21,7 @@ class StatisticsWindow:
         self.win = win
         self.view_manager = view_manager
 
+        # Set up the GUI elements:
         background_load = Image.open(LOADING_WINDOW_BACKGROUND_PATH)
         background_width = 400
         background_height = 100
@@ -29,6 +29,9 @@ class StatisticsWindow:
             (background_width, background_height), Image.ANTIALIAS)
         background_img = ImageTk.PhotoImage(background_load)
 
+        self.title_label = Label(win, text='Generate Statistics')
+        self.title_label.config(font=('Times', 14, 'italic'))
+        self.title_label.place(x=130, y=105)
         self.background = Label(win, image=background_img)
         self.background.image = background_img
         self.background.place(x=0, y=0)
@@ -39,10 +42,10 @@ class StatisticsWindow:
                                         bg='grey',
                                         padx=10,
                                         pady=5)
-        generate_report_button.place(x=145, y=115)
+        generate_report_button.place(x=145, y=150)
 
-        back_button = Button(win, text='Return To Options Menu', command=self.back_requested)
-        back_button.place(x=130, y=160)
+        back_button = Button(win, text='Return To Main Menu', command=self.back_requested)
+        back_button.place(x=137, y=210)
 
         self._init_chains()
 
@@ -51,6 +54,7 @@ class StatisticsWindow:
 
     def generate_report(self):
         f = asksaveasfile(mode='w', defaultextension='.csv')
+
         # If None, the user hit cancel:
         if f is not None:
             writer = csv.writer(f, lineterminator='\n')
@@ -60,7 +64,7 @@ class StatisticsWindow:
             for i in range(len(self.chains)):
                 ids.append(self.chains[i].unique_id)
 
-            writer.writerow(['Filopodia Index:'] + ids)
+            writer.writerow(['Filo_Index:'] + ids)
 
             for stat in self._gather_stats_keys():
                 writer.writerow([stat + ':'])

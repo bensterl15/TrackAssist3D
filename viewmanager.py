@@ -57,7 +57,7 @@ class ViewManager:
 
         elif current_view == 'stats':
             incomplete_tracking_pairs = self.tracking_incomplete()
-            self.active_window.geometry("400x200")
+            self.active_window.geometry("400x250")
             if not incomplete_tracking_pairs:
                 StatisticsWindow(self.active_window, self)
             else:

@@ -1,11 +1,8 @@
-from random import randint
 import numpy as np
 
 import pyvista as pv
 import mat73
 from scipy.io import loadmat
-
-from Model.constants_and_paths import MAX_PROTRUSIONS_INDEX
 
 
 class Mesh:
@@ -24,7 +21,7 @@ class Mesh:
         mesh_vertices = mesh_dict['surface']['vertices']
         mesh_faces = mesh_dict['surface']['faces']
 
-        # Cast faces to int.. Subtract 1 to change from MATLAB 1-indexed:
+        # Cast faces to int. Subtract 1 to change from MATLAB 1-indexed:
         mesh_faces = mesh_faces.astype(int) - 1
         # We need to put 3's in front of each face to indicate it is a triangle:
         mesh_faces = np.hstack((3 * np.ones((mesh_faces.shape[0], 1), dtype=int), mesh_faces))
@@ -118,9 +115,9 @@ class Mesh:
         vertices_centered = vertices_unique - mean
         # This is like an estimation of multi-dimensional normal covariance matrix estimator:
         cov_hat = np.matmul(np.transpose(vertices_centered), vertices_centered) / (np.shape(vertices_centered)[0] - 1)
-        L, Q = np.linalg.eig(cov_hat)
-        greatest_eval_index = np.argmax(L)
-        principal_direction = Q[:, greatest_eval_index]
+        l, q = np.linalg.eig(cov_hat)
+        greatest_eval_index = np.argmax(l)
+        principal_direction = q[:, greatest_eval_index]
 
         # x^z + y^2 + z^2 = 1, because eig produces unitary Q
         x = principal_direction[0]
@@ -150,8 +147,7 @@ class Mesh:
         azimuth = (azimuth + 36000) % 360
         inclination = (inclination + 36000) % 360
 
-        return (azimuth, inclination)
-
+        return azimuth, inclination
 
     # Don't know how, but this should be STATIC METHOD:
     # (We will use it again later in the statistics step:)

@@ -1,6 +1,7 @@
 from tkinter import Button, StringVar, OptionMenu, Label
 import numpy as np
 
+
 class StepsWindow:
 
     def __init__(self, win, view_manager):
@@ -46,19 +47,19 @@ class StepsWindow:
         back_button.place(x=15, y=210)
 
         # Window title and directions
-        steps_label = Label(win, text='Main Menu', bg="#e0dfda", height=2, width=40)
-        remMenu_label = Label(win, text='Select a surface:')
-        trackMenu_label = Label(win, text='Select surfaces:')
+        steps_label = Label(win, text='Main Menu', bg="grey", height=2, width=40)
+        remove_menu_label = Label(win, text='Select a surface:')
+        track_menu_label = Label(win, text='Select surfaces:')
 
         # Configure labels
         steps_label.config(font=('Times', 14, 'italic'))
-        remMenu_label.config(font=('Times', 12))
-        trackMenu_label.config(font=('Times', 12))
+        remove_menu_label.config(font=('Times', 12))
+        track_menu_label.config(font=('Times', 12))
 
         # Position window title and directions
         steps_label.place(x=0, y=0)
-        remMenu_label.place(x=205, y=60)
-        trackMenu_label.place(x=205, y=110)
+        remove_menu_label.place(x=205, y=60)
+        track_menu_label.place(x=205, y=110)
 
     def start_view_requested(self):
         self.view_manager.back_to_start()

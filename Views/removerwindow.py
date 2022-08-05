@@ -9,8 +9,7 @@ from Model.mesh import Mesh
 from Model.singlemeshplotter import SingleMeshPlotter
 
 # Import the constants we need:
-from Model.constants_and_paths import MESH_PATH_OFFSET, SURFACE_SEGMENT_PATH_OFFSET, \
-    REMOVER_WINDOW_BACKGROUND_PATH, PLUS_BUTTON_PATH, MINUS_BUTTON_PATH, NEXT_BUTTON_PATH,\
+from Model.constants_and_paths import MESH_PATH_OFFSET, REMOVER_WINDOW_BACKGROUND_PATH, \
     MOTIF_SEGMENT_PATH_OFFSET, REMOVAL_PATH_OFFSET
 
 
@@ -40,22 +39,17 @@ class RemoverWindow:
         path_mesh = os.path.join(base_directory,
                                  os.path.join(
                                      MESH_PATH_OFFSET,
-                                     'surface_1_1.mat'
-                                 )
-                                 )
+                                     'surface_1_1.mat'))
+
         path_segmentation = os.path.join(base_directory,
                                          os.path.join(
                                              MOTIF_SEGMENT_PATH_OFFSET,
-                                             os.path.join('ch1', 'blebSegment_1_1.mat')
-                                         )
-                                         )
+                                             os.path.join('ch1', 'blebSegment_1_1.mat')))
 
         path_statistics = os.path.join(base_directory,
-                                         os.path.join(
-                                             MOTIF_SEGMENT_PATH_OFFSET,
-                                             'blebSegmentStats.mat'
-                                         )
-                                         )
+                                       os.path.join(
+                                           MOTIF_SEGMENT_PATH_OFFSET,
+                                           'blebSegmentStats.mat'))
 
         # Set up the mesh here:
         self.mesh = Mesh(path_mesh, path_segmentation, path_statistics)
@@ -68,17 +62,6 @@ class RemoverWindow:
         background_load = background_load.resize(
             (background_width, background_height), Image.ANTIALIAS)
         background_img = ImageTk.PhotoImage(background_load)
-
-        button_width = 50
-        plus_button_load = Image.open(PLUS_BUTTON_PATH)
-        minus_button_load = Image.open(MINUS_BUTTON_PATH)
-        next_button_load = Image.open(NEXT_BUTTON_PATH)
-        plus_button_load = plus_button_load.resize((button_width, button_width), Image.ANTIALIAS)
-        minus_button_load = minus_button_load.resize((button_width, button_width), Image.ANTIALIAS)
-        next_button_load = next_button_load.resize((button_width, button_width), Image.ANTIALIAS)
-        plus_button_img = ImageTk.PhotoImage(plus_button_load)
-        minus_button_img = ImageTk.PhotoImage(minus_button_load)
-        next_button_img = ImageTk.PhotoImage(next_button_load)
 
         self.background = Label(win, image=background_img)
         self.background.image = background_img
@@ -93,7 +76,6 @@ class RemoverWindow:
         self.description_label.place(x=35, y=170)
 
         self.next_button = Button(win, text='Next', command=self.next)
-        self.next_button.image = next_button_img
         self.next_button.place(x=335, y=460)
 
         back_button = Button(win, text='Return to Main Menu', command=self.back_requested)

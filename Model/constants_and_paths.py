@@ -3,6 +3,7 @@ import sys
 
 DEBUG = True
 
+
 def resource_path(relative_path):
     """ Get absolute path to resource, works for dev and for PyInstaller """
     try:
@@ -12,6 +13,7 @@ def resource_path(relative_path):
         base_path = os.path.abspath(".")
 
     return os.path.join(base_path, relative_path)
+
 
 ANALYSIS_OFFSET = os.path.join('Morphology', 'Analysis')
 MESH_PATH_OFFSET = os.path.join(ANALYSIS_OFFSET, os.path.join('Mesh', 'ch1'))
@@ -28,15 +30,9 @@ if DEBUG:
     PAIRING_WINDOW_BACKGROUND_PATH = ROOT_STR + "TA3D_Logo.PNG"
     REMOVER_WINDOW_BACKGROUND_PATH = PAIRING_WINDOW_BACKGROUND_PATH
     LOADING_WINDOW_BACKGROUND_PATH = PAIRING_WINDOW_BACKGROUND_PATH
-    PLUS_BUTTON_PATH = ROOT_STR + "plus_button.PNG"
-    MINUS_BUTTON_PATH = ROOT_STR+"minus_button.PNG"
-    NEXT_BUTTON_PATH = ROOT_STR+"next_button.PNG"
     ICON_PATH = ROOT_STR+"TA3D_Icon.ico"
 else:
     PAIRING_WINDOW_BACKGROUND_PATH = resource_path('TA3D_Logo.PNG')
     REMOVER_WINDOW_BACKGROUND_PATH = PAIRING_WINDOW_BACKGROUND_PATH
     LOADING_WINDOW_BACKGROUND_PATH = PAIRING_WINDOW_BACKGROUND_PATH
-    PLUS_BUTTON_PATH = resource_path("plus_button.PNG")
-    MINUS_BUTTON_PATH = resource_path("minus_button.PNG")
-    NEXT_BUTTON_PATH = resource_path("next_button.PNG")
     ICON_PATH = resource_path("TA3D_Icon.ico")
