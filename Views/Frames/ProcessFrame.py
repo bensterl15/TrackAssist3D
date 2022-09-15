@@ -13,6 +13,8 @@ import zarr
 import nibabel as nib
 import scipy.signal
 
+import re
+
 from Views.Frames.MainTextFrame import MainTextFrame
 from Views.Frames.SelectFolderFrame import SelectFolderFrame
 
@@ -49,7 +51,7 @@ class ProcessFrame(ttk.Frame):
             text='Process_Expand',
             command=self._process_expand
         )
-        processExpand_button.grid(column=0, row=1, **options)
+        processExpand_button.grid(column=0, row=1,**options)
 
         self.textFrame = MainTextFrame(self)
 
@@ -85,7 +87,9 @@ class ProcessFrame(ttk.Frame):
             dataset = container.create_dataset(name + '/' + str(i), shape=arr[i].shape)
             dataset[:] = arr[i]
 
-
+    '''
+        Plan A: COPY CODE to here, and we can add the processing information in the text box
+    '''
     def execute_process(self):
 
         rawDataPath = self.selectFolderframe.getRawDataPath()
@@ -96,17 +100,26 @@ class ProcessFrame(ttk.Frame):
         print("gtDataPath:  "+gtDataPath)
         print("thresholdsNpyPath:  "+thresholdsNpyPath)
 
-        names = []
-        lst_order = [0, 6, 7, 8, 9, 10, 11, 12, 13, 1, 2, 3, 4, 5]
-
         zarr_container = zarr.open('./output/3Dtraining.zarr', 'w')
 
         '''
         ***************************************test for only 1*********************************************************
         '''
-        for i in range(1):
-        # for i in range(21):
-            names.append('T' + str(i + 1))
+
+        raw_list = os.listdir(rawDataPath)
+        sort_tmp = [int(re.sub("[^0-9]", "", s)) for s in raw_list]
+        raw_list = [x for _, x in sorted(zip(sort_tmp, raw_list))]
+
+        gt_list = os.listdir(gtDataPath)
+        sort_tmp = [int(re.sub("[^0-9]", "", s)) for s in gt_list]
+        gt_list = [x for _, x in sorted(zip(sort_tmp, gt_list))]
+
+        if len(raw_list) != len(gt_list):
+            tk.messagebox.showerror('Error', 'Raw and ground truth contain different number of timepoints')
+            return
+
+        n_timepoints = len(raw_list)
+
         '''
         ***************************************test for only 1*********************************************************
         '''
@@ -116,81 +129,49 @@ class ProcessFrame(ttk.Frame):
         # We only recorded half for training, so repeat because ugh..
         thresholds = thresholds.repeat(2)
 
-        raw = np.zeros((21, 14, 256, 256))
-        gt = np.zeros((21, 14, 256, 256))
-        num_name = 0
-        for name in names:
+        # Get shape information:
+        dummy = 0
+        try:
+            dummy = tifffile.imread(os.path.join(rawDataPath, raw_list[0]))
+        except:
+            dummy = tifffile.imread(os.path.join(rawDataPath, raw_list[0]))
+        (nZ, nX, nY) = dummy.shape
 
-            self.textFrame.insert("Processing "+str(name)+"... ")
+        raw = np.zeros((n_timepoints, nZ, nX, nY))
+        gt = np.zeros((n_timepoints, nZ, nX, nY))
+
+        for time_index in range(n_timepoints):
+            raw_name = os.path.join(rawDataPath, raw_list[time_index])
+            gt_name = os.path.join(gtDataPath, gt_list[time_index])
+
+            '''
+                Add the information in the text box
+            '''
+            self.textFrame.insert(f"Processing {raw_name} and {gt_name}... ")
             # self.textFrame.see()
             # self.textFrame.update_idletasks()
 
-
             raw_ = 0
-            gt_ = np.zeros((14, 512, 512))
             try:
-                raw_ = tifffile.imread(os.path.join(rawDataPath, name, name + '.tiff'))
+                raw_ = tifffile.imread(raw_name)
             except:
-                raw_ = tifffile.imread(os.path.join(rawDataPath, name, name + '.tif'))
+                raw_ = tifffile.imread(raw_name)
 
-            lst_gt = os.listdir(os.path.join(gtDataPath, name))
-            lst_gt.sort()
-            for i in range(14):
-                gt_[i] = imageio.imread(os.path.join(gtDataPath, name, lst_gt[lst_order[i]]))
-
-            # raw_ = scipy.signal.resample(raw_, 40, axis = 0)
-            raw_ = raw_ / np.max(raw_)
-
-            mean_x = 0
-            mean_y = 0
-            for z_ind in range(14):
-                for x_ind in range(512):
-                    for y_ind in range(512):
-                        mean_x += x_ind * raw_[z_ind, x_ind, y_ind]
-                        mean_y += y_ind * raw_[z_ind, x_ind, y_ind]
-
-            mean_x = int(mean_x)
-            mean_y = int(mean_y)
-
-            # gt_ = scipy.signal.resample(gt_, 40, axis = 0)
-            gt_[gt_ <= 0.5] = 0
-            gt_[gt_ > 0.5] = 1
-
-            # Override for now.. UGH
-            mean_x = 130
-            mean_y = 315
-            width = 128
-
-            print(num_name)
-
-            raw[num_name] = raw_[:, (mean_x - width):(mean_x + width), (mean_y - width):(mean_y + width)]
-            gt[num_name] = gt_[:, (mean_x - width):(mean_x + width), (mean_y - width):(mean_y + width)]
+            gt_ = 0
+            try:
+                gt_ = tifffile.imread(gt_name)
+            except:
+                gt_ = tifffile.imread(gt_name)
 
             # img = nib.Nifti1Image(raw[num_name], affine=np.eye(4))
             # nib.save(img, f'ugh{name}.nii')
 
-            raw[raw < thresholds[num_name]] = 0
+            raw_[raw_ < thresholds[time_index]] = 0
 
-            '''
-            plt.subplot(311)
-            plt.imshow(raw[num_name,7])
-            plt.colorbar()
+            raw[time_index] = raw_
+            gt[time_index] = gt_
 
-            #raw[gt == 0] = 0
-
-            plt.subplot(312)
-            plt.imshow(raw[num_name,7])
-            plt.colorbar()
-
-            plt.subplot(313)
-            plt.imshow(gt[num_name,7])
-            plt.show()
-            '''
-
-            num_name = num_name + 1
-
-
-            self.textFrame.insert(str(name)+" is done. ")
+            self.textFrame.insert(f"{time_index} step is done. ")
 
         self.save_to_container(raw, zarr_container, 'raw')
         self.save_to_container(gt, zarr_container, 'gt')
@@ -206,50 +187,56 @@ class ProcessFrame(ttk.Frame):
         '''
         ***************************************test for only 1*********************************************************
         '''
-        for i in range(1):
-            # for i in range(21):
-            names.append('T' + str(i + 1))
+
         '''
         ***************************************test for only 1*********************************************************
         '''
 
-        raw = np.zeros((21, 60, 256, 256))
-        num_name = 0
-        for name in names:
+        raw_list = os.listdir(rawDataPath)
+        sort_tmp = [int(re.sub("[^0-9]", "", s)) for s in raw_list]
+        raw_list = [x for _, x in sorted(zip(sort_tmp, raw_list))]
 
-            self.textFrame.insert("Processing " + str(name) + "... ")
+        n_timesteps = len(raw_list)
+
+        thresholdsNpyPath = self.selectFolderframe.getThreholdsNpyPath()
+        thresholds = np.load(thresholdsNpyPath)
+        thresholds = thresholds[::40]
+        # We only recorded half for training, so repeat because ugh..
+        thresholds = thresholds.repeat(2)
+
+        # Get shape information:
+        dummy = 0
+        try:
+            dummy = tifffile.imread(os.path.join(rawDataPath, raw_list[0]))
+        except:
+            dummy = tifffile.imread(os.path.join(rawDataPath, raw_list[0]))
+        (nZ, nX, nY) = dummy.shape
+
+        z_interp = 60
+
+        raw = np.zeros((n_timesteps, z_interp, nX, nY))
+        num_name = 0
+        for time_index in range(n_timesteps):
+
+            raw_name = os.path.join(rawDataPath, raw_list[time_index])
+            self.textFrame.insert(f"Processing {raw_name}... ")
 
             raw_ = 0
             try:
-                raw_ = tifffile.imread(os.path.join(rawDataPath, name, name + '.tiff'))
+                raw_ = tifffile.imread(raw_name)
             except:
-                raw_ = tifffile.imread(os.path.join(rawDataPath, name, name + '.tif'))
+                raw_ = tifffile.imread(raw_name)
 
-            raw_ = scipy.signal.resample(raw_, 40, axis=0)
+            raw_ = scipy.signal.resample(raw_, z_interp - 20, axis=0)
             raw_ = raw_ / np.max(raw_)
 
-            mean_x = 0
-            mean_y = 0
-            for z_ind in range(14):
-                for x_ind in range(512):
-                    for y_ind in range(512):
-                        mean_x += x_ind * raw_[z_ind, x_ind, y_ind]
-                        mean_y += y_ind * raw_[z_ind, x_ind, y_ind]
+            raw_[raw_ < thresholds[time_index]] = 0
 
-            mean_x = int(mean_x)
-            mean_y = int(mean_y)
+            # We pad with ten layers of zeros on each side:
+            raw[num_name, 10:(z_interp - 10)] = raw_
 
-            # Override for now.. UGH
-            mean_x = 130
-            mean_y = 315
-            width = 128
-
-            print(num_name)
-
-            raw[num_name, 10:50] = raw_[:, (mean_x - width):(mean_x + width), (mean_y - width):(mean_y + width)]
-
-            img = nib.Nifti1Image(raw[num_name, 10:50], affine=np.eye(4))
-            nib.save(img, f'ugh{name}.nii')
+            #img = nib.Nifti1Image(raw[num_name, 10:(z_interp - 10)], affine=np.eye(4))
+            #nib.save(img, f'ugh{name}.nii')
 
             # raw[raw < 0.2] = 0
 

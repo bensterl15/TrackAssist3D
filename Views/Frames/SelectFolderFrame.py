@@ -5,6 +5,7 @@ from tkinter.filedialog import askdirectory, askopenfile
 from tkinter.messagebox import showinfo
 import os
 
+from Views.thresholdsWindow import ThresholdsWindow
 
 class SelectFolderFrame(ttk.Frame):
 
@@ -63,6 +64,14 @@ class SelectFolderFrame(ttk.Frame):
         )
         open_button.grid(column=2, row=2, sticky='W', **options)
 
+        # Button to generate the thresholds.py:
+        open_button = ttk.Button(
+            self,
+            text='Generate thresholds.npy',
+            command=self.generate_thresholds_npy_path
+        )
+        open_button.grid(column=3, row=2, sticky='W', **options)
+
 
 
     def select_raw_data_path(self):
@@ -82,27 +91,22 @@ class SelectFolderFrame(ttk.Frame):
 
     def select_thresholds_npy_path(self):
         file = askopenfile(title='Select thresholds.npy', mode='r', filetypes=[('npy Files', '*.npy')])
-        path = os.path.abspath(file.name)
-        self.thresholdsNpyPath = path
-        self.set_thresholds_npy_path(path)
-
-        return
-
+        if file is not None:
+            path = os.path.abspath(file.name)
+            self.thresholdsNpyPath = path
+            self.set_thresholds_npy_path(path)
 
     def set_raw_data_path(self, path):
         self.rawData_path_entry.delete(0, 0)
         self.rawData_path_entry.insert(0, path)
-        return
 
     def set_gt_data_path(self, path):
         self.gtData_path_entry.delete(0, 0)
         self.gtData_path_entry.insert(0, path)
-        return
 
     def set_thresholds_npy_path(self, path):
         self.thresholds_npy_path_entry.delete(0, 0)
         self.thresholds_npy_path_entry.insert(0, path)
-        return
 
     def getRawDataPath(self):
         return self.rawDataPath
@@ -112,3 +116,9 @@ class SelectFolderFrame(ttk.Frame):
 
     def getThreholdsNpyPath(self):
         return self.thresholdsNpyPath
+
+    # Creates a dialog to create a thresholds.npy file:
+    def generate_thresholds_npy_path(self):
+        window = tk.Tk()
+        ThresholdsWindow(window, self)
+        #window.mainloop()
