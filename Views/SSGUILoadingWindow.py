@@ -52,6 +52,8 @@ class SSGUILoadingWindow:
         self.next_button = ttk.Button(self.win, text='Next', command=self.next)
         self.next_button.place(x=150, y=250)
 
+        #TODO：Add a back to start button
+
     def next(self):
         if(self.current_view == "init"):
             self.label1.config(style="C.TLabel")

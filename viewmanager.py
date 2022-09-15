@@ -1,6 +1,9 @@
 '''Import the necessary GUI modules:'''
 import os.path
 from tkinter import Tk, messagebox
+
+from Views.SSGUILoadingWindow import SSGUILoadingWindow
+from Views.initwindow import InitWindow
 from Views.removerwindow import RemoverWindow
 from Views.pairingwindow import PairingWindow
 from Views.loadingwindow import LoadingWindow
@@ -15,7 +18,8 @@ class ViewManager:
     def __init__(self):
         self.active_window = Tk()
         self.active_window.iconbitmap(ICON_PATH)
-        LoadingWindow(self.active_window, self)
+        # LoadingWindow(self.active_window, self)
+        InitWindow(self.active_window,self)
 
         self.base_dirs = ()
         # Keep track of which cell we are currently removing protrusions from:
@@ -35,6 +39,8 @@ class ViewManager:
         self.active_window.destroy()
         self.active_window = Tk()
         self.active_window.iconbitmap(ICON_PATH)
+
+        window_title = 'TrackAssist3D'
 
         # TODO: Get this screen working for more than 2 cells at a time:
 
@@ -63,7 +69,25 @@ class ViewManager:
                               'The following tracking has not been performed: '
                               + ', '.join(incomplete_tracking_pairs))
                 StepsWindow(self.active_window, self)
-        self.active_window.title('TrackAssist3D')
+        elif current_view == 'SegmentationSkelotonLoading':
+            SSGUILoadingWindow(self.active_window, self)
+
+            window_width = 800
+            window_height = 400
+
+            # get the screen dimension
+            screen_width = self.active_window.winfo_screenwidth()
+            screen_height = self.active_window.winfo_screenheight()
+
+            # find the center point
+            center_x = int(screen_width / 2 - window_width / 2)
+            center_y = int(screen_height / 2 - window_height / 2)
+
+            window_title = 'SegmentationSkeletonGUI'
+            self.active_window.geometry(f'{window_width}x{window_height}+{center_x}+{center_y}')
+
+
+        self.active_window.title(window_title)
         self.active_window.mainloop()
 
     def change_to_step_view(self, directories):
@@ -111,3 +135,6 @@ class ViewManager:
             if not os.path.exists(t_dir) and index > 0:
                 incomplete_pairs.append(index)
         return incomplete_pairs
+
+    def go_to_SegmentationSkelotonGUI(self):
+        self.change_view('SegmentationSkelotonLoading')
