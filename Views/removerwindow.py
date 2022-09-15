@@ -9,8 +9,7 @@ from Model.mesh import Mesh
 from Model.singlemeshplotter import SingleMeshPlotter
 
 # Import the constants we need:
-from Model.constants_and_paths import MESH_PATH_OFFSET, SURFACE_SEGMENT_PATH_OFFSET, \
-    REMOVER_WINDOW_BACKGROUND_PATH, PLUS_BUTTON_PATH, MINUS_BUTTON_PATH, NEXT_BUTTON_PATH,\
+from Model.constants_and_paths import MESH_PATH_OFFSET, REMOVER_WINDOW_BACKGROUND_PATH, \
     MOTIF_SEGMENT_PATH_OFFSET, REMOVAL_PATH_OFFSET
 
 
@@ -40,22 +39,17 @@ class RemoverWindow:
         path_mesh = os.path.join(base_directory,
                                  os.path.join(
                                      MESH_PATH_OFFSET,
-                                     'surface_1_1.mat'
-                                 )
-                                 )
+                                     'surface_1_1.mat'))
+
         path_segmentation = os.path.join(base_directory,
                                          os.path.join(
                                              MOTIF_SEGMENT_PATH_OFFSET,
-                                             os.path.join('ch1', 'blebSegment_1_1.mat')
-                                         )
-                                         )
+                                             os.path.join('ch1', 'blebSegment_1_1.mat')))
 
         path_statistics = os.path.join(base_directory,
-                                         os.path.join(
-                                             MOTIF_SEGMENT_PATH_OFFSET,
-                                             'blebSegmentStats.mat'
-                                         )
-                                         )
+                                       os.path.join(
+                                           MOTIF_SEGMENT_PATH_OFFSET,
+                                           'blebSegmentStats.mat'))
 
         # Set up the mesh here:
         self.mesh = Mesh(path_mesh, path_segmentation, path_statistics)
@@ -63,40 +57,32 @@ class RemoverWindow:
 
         # Take care of all the GUI stuff:
         background_load = Image.open(REMOVER_WINDOW_BACKGROUND_PATH)
-        background_width = 800
-        background_height = 300
+        background_width = 405
+        background_height = 120
         background_load = background_load.resize(
             (background_width, background_height), Image.ANTIALIAS)
         background_img = ImageTk.PhotoImage(background_load)
 
-        button_width = 50
-        plus_button_load = Image.open(PLUS_BUTTON_PATH)
-        minus_button_load = Image.open(MINUS_BUTTON_PATH)
-        next_button_load = Image.open(NEXT_BUTTON_PATH)
-        plus_button_load = plus_button_load.resize((button_width, button_width), Image.ANTIALIAS)
-        minus_button_load = minus_button_load.resize((button_width, button_width), Image.ANTIALIAS)
-        next_button_load = next_button_load.resize((button_width, button_width), Image.ANTIALIAS)
-        plus_button_img = ImageTk.PhotoImage(plus_button_load)
-        minus_button_img = ImageTk.PhotoImage(minus_button_load)
-        next_button_img = ImageTk.PhotoImage(next_button_load)
-
         self.background = Label(win, image=background_img)
         self.background.image = background_img
-        self.background.place(x=(1200 - background_width) / 2, y=50)
+        self.background.place(x=-2, y=0)
 
-        self.description_label = Label(win, text='Select the protrusions to keep:')
-        self.description_label.config(font=("Courier", 24))
-        self.description_label.place(x=(1200 - background_width) / 2, y=375)
+        self.title_label = Label(win, text='Excess Protrusion Removal')
+        self.title_label.config(font=("Times", 14, 'italic'))
+        self.title_label.place(x=95, y=125)
 
-        self.next_button = Button(win, text='Next', command=self.next, image=next_button_img)
-        self.next_button.image = next_button_img
-        self.next_button.place(x=1100, y=700)
+        self.description_label = Label(win, text='Select the protrusions to keep below:')
+        self.description_label.config(font=("Times", 14))
+        self.description_label.place(x=35, y=170)
 
-        back_button = Button(win, text='Back To Steps Screen', command=self.back_requested)
-        back_button.place(x=100, y=100)
+        self.next_button = Button(win, text='Next', command=self.next)
+        self.next_button.place(x=335, y=460)
+
+        back_button = Button(win, text='Return to Main Menu', command=self.back_requested)
+        back_button.place(x=35, y=460)
 
         self.lb_frame = Frame(win, width=background_width, height=background_height)
-        self.lb_frame.place(x=(1200 - background_width) / 2, y=500)
+        self.lb_frame.place(x=35, y=200)
 
         self.vsb = Scrollbar(self.lb_frame, orient="vertical")
         self.text = Text(self.lb_frame, width=40, height=15, yscrollcommand=self.vsb.set)
@@ -126,8 +112,8 @@ class RemoverWindow:
     def next(self):
         if messagebox.askyesno(
                 title='Confirmation',
-                message='Are you sure you would like to proceed? FiloTracker will overwrite'
-                        ' any contents it ran for this cell'):
+                message='Are you sure you would like to proceed? TrackAssist3D will overwrite'
+                        ' any contents it ran for this cell.'):
 
             removal_segment_dir = os.path.join(self.base_directory, REMOVAL_PATH_OFFSET)
             if not Path(removal_segment_dir).is_dir():

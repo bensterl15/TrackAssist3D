@@ -1,6 +1,6 @@
 import sys
 from tkinter import messagebox
-import pyvistaqt as pvqt
+import pyvistaqt as vista
 import pyvista as pv
 import numpy as np
 
@@ -9,7 +9,7 @@ class PairMeshPlotter:
     def __init__(self, mesh1, mesh2):
         self.mesh1 = mesh1
         self.mesh2 = mesh2
-        self.plotter = pvqt.MultiPlotter(nrows=2, ncols=1)
+        self.plotter = vista.MultiPlotter(nrows=2, ncols=1)
         self.plotter[0, 0].app_window.signal_close.connect(self.plotter_closed)
         self.plotter[1, 0].app_window.signal_close.connect(self.plotter_closed)
 
@@ -22,7 +22,7 @@ class PairMeshPlotter:
 
         self.protrusion_actors = []
         for i, region in enumerate(self.mesh2.regions):
-            # Save the protrusion actors so we can change their colors later:
+            # Save the protrusion actors, so we can change their colors later:
             self.protrusion_actors.append(self.plotter[1, 0].add_mesh(
                 region, color=self.mesh2.protrusion_colors[i], show_edges=False))
         self.base_actor2 = self.plotter[1, 0].add_mesh(self.mesh2.base_cell)

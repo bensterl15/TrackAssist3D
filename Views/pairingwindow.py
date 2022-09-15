@@ -9,9 +9,10 @@ from PIL import ImageTk, Image
 from Model.mesh import Mesh
 from Model.pairmeshplotter import PairMeshPlotter
 from Model.constants_and_paths import MESH_PATH_OFFSET, PAIRING_WINDOW_BACKGROUND_PATH, \
-    PLUS_BUTTON_PATH, MINUS_BUTTON_PATH, NEXT_BUTTON_PATH, REMOVAL_PATH_OFFSET, TRACKING_PATH_OFFSET
+    REMOVAL_PATH_OFFSET, TRACKING_PATH_OFFSET
 
 sys.path.append(os.path.abspath(os.path.join('..', 'Model')))
+
 
 def rgb_to_hex(color_vector):
     red = f'{int(color_vector[0] * 255):02X}'
@@ -19,8 +20,10 @@ def rgb_to_hex(color_vector):
     blue = f'{int(color_vector[2] * 255):02X}'
     return '#' + red + green + blue
 
+
 class PairingWindow:
-    '''The view for finding protrusion trajectories between two timepoints:'''
+    """The view for finding protrusion trajectories between two timepoints:"""
+
     def __init__(self, win, view_manager, base_directory1, base_directory2):
         self.win = win
         self.view_manager = view_manager
@@ -28,10 +31,10 @@ class PairingWindow:
         self.base_directory1 = base_directory1
         # Load paths of mesh and motif segmentations:
         path_mesh1 = os.path.join(base_directory1,
-                                    os.path.join(
-                                        MESH_PATH_OFFSET,
-                                        'surface_1_1.mat'
-                                    ))
+                                  os.path.join(
+                                      MESH_PATH_OFFSET,
+                                      'surface_1_1.mat'
+                                  ))
 
         # We would like to use the previous tracking data,
         # but if it is the very first cell in the sequence, we need to load it from removal
@@ -40,13 +43,13 @@ class PairingWindow:
                                               os.path.join(
                                                   TRACKING_PATH_OFFSET,
                                                   'surfaceSegment_1_1.mat'
-                                                           ))
+                                              ))
 
             path_statistics1 = os.path.join(base_directory1,
-                                             os.path.join(
-                                                 TRACKING_PATH_OFFSET,
-                                                 'blebStats_1_1.mat'
-                                             ))
+                                            os.path.join(
+                                                TRACKING_PATH_OFFSET,
+                                                'blebStats_1_1.mat'
+                                            ))
             # Set up the mesh here:
             self.mesh1 = Mesh(path_mesh1,
                               path_segmentation1,
@@ -56,36 +59,33 @@ class PairingWindow:
             path_segmentation1 = os.path.join(base_directory1,
                                               os.path.join(
                                                   REMOVAL_PATH_OFFSET,
-                                                  'surfaceSegment_1_1.mat'
-                                                           ))
+                                                  'surfaceSegment_1_1.mat'))
 
             path_statistics1 = os.path.join(base_directory1,
-                                             os.path.join(
-                                                 REMOVAL_PATH_OFFSET,
-                                                 'blebStats_1_1.mat'
-                                             ))
-            # Set up the first mesh here: Set default_base
-            # to false because we want to see all protrusions at first:
+                                            os.path.join(
+                                                REMOVAL_PATH_OFFSET,
+                                                'blebStats_1_1.mat'))
+            # Set up the first mesh here: Set default_base to false because we want to see all protrusions at first:
             self.mesh1 = Mesh(path_mesh1,
                               path_segmentation1,
                               path_statistics1,
                               default_base=False)
 
         self.base_directory2 = base_directory2
+
         # Load paths of mesh and motif segmentations:
         path_mesh2 = os.path.join(base_directory2,
-                        os.path.join(MESH_PATH_OFFSET, 'surface_1_1.mat'))
+                                  os.path.join(MESH_PATH_OFFSET, 'surface_1_1.mat'))
 
         path_segmentation2 = os.path.join(base_directory2,
-                          os.path.join(REMOVAL_PATH_OFFSET, 'surfaceSegment_1_1.mat'))
+                                          os.path.join(REMOVAL_PATH_OFFSET, 'surfaceSegment_1_1.mat'))
 
         path_statistics2 = os.path.join(base_directory2,
-                                         os.path.join(
-                                             REMOVAL_PATH_OFFSET,
-                                             'blebStats_1_1.mat'
-                                         ))
-        # The second mesh starts with all black protrusions
-        # because we need to match them from mesh1:
+                                        os.path.join(
+                                            REMOVAL_PATH_OFFSET,
+                                            'blebStats_1_1.mat'))
+
+        # The second mesh starts with all black protrusions because we need to match them from mesh1:
         self.mesh2 = Mesh(path_mesh2,
                           path_segmentation2,
                           path_statistics2,
@@ -142,10 +142,11 @@ class PairingWindow:
         self.plotter.update_mesh2(button_index, value)
 
     def dropdown_changed(self, *_):
-        '''Method called when one of the dropdowns on-screen changed:'''
+        """Method called when one of the dropdowns on-screen changed:"""
         dropdown = 0
         value = ''
         detected_change = False
+
         # Dumb way to find out which dropdown the user selected:
         for i in range(self.mesh1.segmentation_unique.shape[0] - 1):
             if self.dropdown_selections[i] != self.optionmenus[i].get():
@@ -165,9 +166,7 @@ class PairingWindow:
 
     def next(self):
         if messagebox.askyesno(title='Confirmation',
-                               message=
-                               'Are you sure you would like to proceed? Project will be overwritten'
-                               ):
+                               message='Are you sure you would like to proceed? The project will be overwritten.'):
 
             # We only need one directory at this step, because only mesh 2 needs to change:
             tracking_segment_dir = os.path.join(self.base_directory2, TRACKING_PATH_OFFSET)
@@ -193,36 +192,32 @@ class PairingWindow:
     def _gui_setup(self):
         # Take care of all the GUI stuff:
         background_load = Image.open(PAIRING_WINDOW_BACKGROUND_PATH)
-        background_width = 800
-        background_height = 300
-        background_load = background_load.resize(
-            (background_width, background_height), Image.ANTIALIAS
-        )
+        background_width = 405
+        background_height = 120
+        background_load = background_load.resize((background_width, background_height), Image.ANTIALIAS)
         background_img = ImageTk.PhotoImage(background_load)
-
-        button_width = 50
-        next_button_load = Image.open(NEXT_BUTTON_PATH)
-        next_button_load = next_button_load.resize((button_width, button_width), Image.ANTIALIAS)
-        next_button_img = ImageTk.PhotoImage(next_button_load)
 
         self.background = Label(self.win, image=background_img)
         self.background.image = background_img
-        self.background.place(x=(1200 - background_width) / 2, y=50)
+        self.background.place(x=-2, y=0)
 
-        self.description_label = Label(self.win, text='Select the best protrusion match:')
-        self.description_label.config(font=("Courier", 24))
-        self.description_label.place(x=(1200 - background_width) / 2, y=375)
+        self.title_label = Label(self.win, text='Protrusion Pair Tracking')
+        self.title_label.config(font=('Times', 14, 'italic'))
+        self.title_label.place(x=100, y=125)
 
-        self.next_button = Button(self.win, text='Next', command=self.next, image=next_button_img)
-        self.next_button.image = next_button_img
-        self.next_button.place(x=1100, y=700)
+        self.description_label = Label(self.win, text='Select the best protrusion matches below:')
+        self.description_label.config(font=('Times', 14))
+        self.description_label.place(x=35, y=170)
 
-        back_button = Button(self.win, text='Back To Steps Screen', command=self.back_requested)
-        back_button.place(x=100, y=100)
+        self.next_button = Button(self.win, text='Next', command=self.next)
+        self.next_button.place(x=335, y=460)
 
-        ### First Checkbox window:
+        back_button = Button(self.win, text='Return to Main Menu', command=self.back_requested)
+        back_button.place(x=35, y=460)
+
+        # First Checkbox window:
         lb_frame = Frame(self.win, width=background_width, height=background_height)
-        lb_frame.place(x=(1200 - background_width) / 2, y=500)
+        lb_frame.place(x=35, y=200)
 
         vsb = Scrollbar(lb_frame, orient="vertical")
         vsb_text = Text(lb_frame, width=40, height=15, yscrollcommand=vsb.set)
@@ -263,6 +258,7 @@ class PairingWindow:
             box_var.set(self.default_op_text)
             dropdown_menu = OptionMenu(lb_frame, box_var, *ops, command=self.dropdown_changed)
             dropdown_menu.config(bg=rgb_to_hex(self.mesh1.protrusion_colors[i]))
+
             # Todo: Consider whether or not we want to change this:
             dropdown_menu.config(state='disabled')
             self.optionmenus.append(box_var)
@@ -271,11 +267,11 @@ class PairingWindow:
 
             # Add the backward/forward buttons:
             backward_button = Button(lb_frame, text='<-', command=lambda ind=i, is_backward=True:
-            self.back_fwd_button_pressed(button_index=ind, is_backward=is_backward))
+                                     self.back_fwd_button_pressed(button_index=ind, is_backward=is_backward))
             vsb_text.window_create("end", window=backward_button)
 
             forward_button = Button(lb_frame, text='->', command=lambda ind=i, is_backward=False:
-            self.back_fwd_button_pressed(button_index=ind, is_backward=False))
+                                    self.back_fwd_button_pressed(button_index=ind, is_backward=False))
             vsb_text.window_create("end", window=forward_button)
 
             # Go to the next line:

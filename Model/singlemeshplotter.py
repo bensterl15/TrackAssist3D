@@ -1,14 +1,14 @@
 import sys
 from tkinter import messagebox
 import numpy as np
-import pyvistaqt as pvqt
+import pyvistaqt as vista
 import pyvista as pv
 
 
 class SingleMeshPlotter:
     def __init__(self, mesh):
         self.mesh = mesh
-        self.plotter = pvqt.BackgroundPlotter()
+        self.plotter = vista.BackgroundPlotter()
         self.plotter.app_window.signal_close.connect(self.plotter_closed)
         self.protrusion_actors = {}
         self.programmatically_closed = False

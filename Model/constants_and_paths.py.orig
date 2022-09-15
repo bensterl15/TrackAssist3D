@@ -26,20 +26,18 @@ VALID_USHAPE3D_DIR_ERROR_MSG = 'Please ensure all directories are valid u-shape3
 MAX_PROTRUSIONS_INDEX = 1e8
 
 if DEBUG:
+<<<<<<< HEAD
     # ROOT_STR = "C:\\Users\\bsterling\\PycharmProjects\\FiloTracker\\"
     ROOT_STR = "D:\\FiloTracker\\"
+=======
+    ROOT_STR = "C:\\Users\\jewel\\Desktop\\Project Files\\FiloTracker\\"
+>>>>>>> jstone
     PAIRING_WINDOW_BACKGROUND_PATH = ROOT_STR + "TA3D_Logo.PNG"
     REMOVER_WINDOW_BACKGROUND_PATH = PAIRING_WINDOW_BACKGROUND_PATH
     LOADING_WINDOW_BACKGROUND_PATH = PAIRING_WINDOW_BACKGROUND_PATH
-    PLUS_BUTTON_PATH = ROOT_STR + "plus_button.PNG"
-    MINUS_BUTTON_PATH = ROOT_STR+"minus_button.PNG"
-    NEXT_BUTTON_PATH = ROOT_STR+"next_button.PNG"
     ICON_PATH = ROOT_STR+"TA3D_Icon.ico"
 else:
     PAIRING_WINDOW_BACKGROUND_PATH = resource_path('TA3D_Logo.PNG')
     REMOVER_WINDOW_BACKGROUND_PATH = PAIRING_WINDOW_BACKGROUND_PATH
     LOADING_WINDOW_BACKGROUND_PATH = PAIRING_WINDOW_BACKGROUND_PATH
-    PLUS_BUTTON_PATH = resource_path("plus_button.PNG")
-    MINUS_BUTTON_PATH = resource_path("minus_button.PNG")
-    NEXT_BUTTON_PATH = resource_path("next_button.PNG")
     ICON_PATH = resource_path("TA3D_Icon.ico")

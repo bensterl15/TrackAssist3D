@@ -1,3 +1,5 @@
+from datetime import date
+
 
 class Chain:
     def __init__(self, time, initial_label):
@@ -5,7 +7,7 @@ class Chain:
         self.last_time = time
         self.last_index = initial_label
         self.initial_label = initial_label
-        self.unique_id = str(time) + ':' + str(initial_label)
+        self.unique_id = str(time) + ':' + str(date.today())[4:].replace('-', '') + ':' + str(initial_label)[:5]
         self.data = [initial_label]
 
     def append(self, protrusion_id, current_time):
