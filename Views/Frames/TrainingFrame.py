@@ -1,8 +1,13 @@
 import tkinter as tk
-from tkinter import ttk, Text
+from tkinter import ttk, Text, filedialog, messagebox
 from Views.Frames.MainTextFrame import MainTextFrame
 from SegmentationSkeloton.segmentation_processing._3DUnet import train
 
+import pickle
+import os
+import subprocess
+#from tensorboard import program
+#from tensorboard import main as tb
 
 class TrainingFrame(ttk.Frame):
 
@@ -31,6 +36,9 @@ class TrainingFrame(ttk.Frame):
         )
         params_open_button.grid(column=2, row=0, sticky='W', **options)
 
+        # Add a checkbox:
+        ch_default = tk.Checkbutton(self, text='Use default model params')
+        ch_default.grid(column=1, row=1)
 
         # convert button
         training_button = ttk.Button(
@@ -60,12 +68,30 @@ class TrainingFrame(ttk.Frame):
             Plan B: run the code directly, but can't show the information in the text box
         '''
 
+
+        '''
+        tb = program.TensorBoard()
+        tb.configure(argv=[None, '--logdir', ' C:\\Users\\bsterling\\PycharmProjects\\FiloTracker\\output\\logs\\'])
+        url = tb.launch()
+        '''
+
+        subprocess.Popen('tensorboard --logdir=\'C:\\Users\\bsterling\\PycharmProjects\\FiloTracker\\output\\logs\' --port=8009')
+
+        #self.textFrame.insert(f'Tensorflow listening on {url}')
+
+        train.train(self.pdict)
+
         self.textFrame.insert( 'Done')
 
     def load_params(self):
-        self.path_params = askdirectory(title='Select saved model parameters')
-        #self.rawDataPath = path
-        #self.set_raw_data_path(path)
+        self.path_params = filedialog.askopenfilename(title='Select saved model parameters',
+                                                      filetypes=(("Pickle Files","*.pickle"),))
+        try:
+            #print(self.path_params)
+            with open(self.path_params, 'rb') as f:
+                self.pdict = pickle.load(f)
+        except:
+            messagebox.showerror('Error', 'Couldnt load the model')
 
     def stop(self):
         exit()

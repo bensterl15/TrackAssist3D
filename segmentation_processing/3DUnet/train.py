@@ -85,7 +85,7 @@ def train(pdict):
 
     iterations = pdict['train_until']
     learning_rate = pdict['learning_rate']
-    model = mknet()
+    model = mknet(pdict)
     loss = torch.nn.BCELoss()
     optimizer = torch.optim.Adam(lr=learning_rate, params=model.parameters())
 

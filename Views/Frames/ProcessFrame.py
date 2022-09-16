@@ -125,9 +125,9 @@ class ProcessFrame(ttk.Frame):
         '''
 
         thresholds = np.load(thresholdsNpyPath)
-        thresholds = thresholds[::40]
+        #thresholds = thresholds[::40]
         # We only recorded half for training, so repeat because ugh..
-        thresholds = thresholds.repeat(2)
+        #thresholds = thresholds.repeat(2)
 
         # Get shape information:
         dummy = 0
@@ -200,9 +200,9 @@ class ProcessFrame(ttk.Frame):
 
         thresholdsNpyPath = self.selectFolderframe.getThreholdsNpyPath()
         thresholds = np.load(thresholdsNpyPath)
-        thresholds = thresholds[::40]
+        #thresholds = thresholds[::40]
         # We only recorded half for training, so repeat because ugh..
-        thresholds = thresholds.repeat(2)
+        #thresholds = thresholds.repeat(2)
 
         # Get shape information:
         dummy = 0

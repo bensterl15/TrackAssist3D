@@ -21,15 +21,15 @@ os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 
 logging.basicConfig(level=logging.ERROR)
 
-# n_samples = 21
-n_samples = 1
+n_samples = 21
+# n_samples = 1
 
 data_dir = "./output/"
 
 zarr_name = '3Dtraining.zarr'
 zarr_path = os.path.join(data_dir, zarr_name)
 print(zarr_path)
-log_dir = 'logs'
+log_dir = 'C:\\Users\\bsterling\\PycharmProjects\\FiloTracker\\output\\logs\\'
 
 
 
@@ -46,11 +46,11 @@ class CustomLoss(torch.nn.Module):
 
 def mknet(pdict):
     num_fmaps = pdict['num_fmaps']
-    fmap_inc_factor = pdict['fmap_inc_factor']
+    fmap_inc_factor = pdict['fmap_inc_factor'][0]
     downsample_factors = pdict['downsample_factors']
     kernel_size_down = pdict['kernel_size_down']
     kernel_size_up = pdict['kernel_size_up']
-    in_channels = pdict['in_channels']
+    in_channels = pdict['in_channels'][0]
     unet = UNet(
         in_channels=in_channels,
         num_fmaps=num_fmaps,
@@ -85,7 +85,7 @@ def train(pdict):
 
     iterations = pdict['train_until']
     learning_rate = pdict['learning_rate']
-    model = mknet()
+    model = mknet(pdict)
     loss = torch.nn.BCELoss()
     optimizer = torch.optim.Adam(lr=learning_rate, params=model.parameters())
 
@@ -142,7 +142,7 @@ def train(pdict):
             1: gt,
         },
         log_dir=log_dir,
-        save_every=20)
+        save_every=1)#20)
 
     pipeline += gp.Squeeze([raw, gt, predict], axis=1)
 
