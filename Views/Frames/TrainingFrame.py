@@ -24,8 +24,8 @@ class TrainingFrame(ttk.Frame):
         options = {'padx': 5, 'pady': 5}
 
         self.path_params = tk.StringVar()
-        self.params_button = ttk.Entry(self, textvariable=self.path_params, width=20)
-        self.params_button.grid(column=1, row=0, **options)
+        self.params_button = ttk.Entry(self, textvariable=self.path_params, width=35)
+        self.params_button.grid(column=1, row=0, sticky='W',**options)
         self.params_button.focus()
 
         # convert button
@@ -34,7 +34,7 @@ class TrainingFrame(ttk.Frame):
             text='Select raw data folder',
             command=self.load_params
         )
-        params_open_button.grid(column=2, row=0, sticky='W', **options)
+        params_open_button.grid(column=1, row=0, sticky='E', **options)
 
         # Add a checkbox:
         ch_default = tk.Checkbutton(self, text='Use default model params')
