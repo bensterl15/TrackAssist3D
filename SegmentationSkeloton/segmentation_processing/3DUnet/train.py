@@ -16,6 +16,9 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 import os
+
+from Model.constants_and_paths import ROOT_STR
+
 os.environ["KMP_DUPLICATE_LIB_OK"]="TRUE"
 
 logging.basicConfig(level=logging.ERROR)
@@ -97,6 +100,11 @@ def mknet():
 	return(model)
 
 def train(iterations):
+	with open(ROOT_STR + "DataDirPath.txt", "r") as f:
+		data_dir = f.readline()
+	f.close()
+
+	zarr_path = os.path.join(data_dir, zarr_name)
 	
 	model = mknet()
 #	loss = CustomLoss() #torch.nn.BCELoss()

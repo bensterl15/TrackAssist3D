@@ -1,15 +1,26 @@
+import os
+
 import scipy
 import scipy.ndimage
 import nibabel as nib
 import numpy as np
 import zarr
 
+from Model.constants_and_paths import ROOT_STR
+
 alpha = 0.1
 
 index = 0
 
 print('START')
-raw = zarr.open('../zarr_creation/3Dexpandedprocessed.zarr', mode='r')
+
+with open(ROOT_STR + "DataDirPath.txt", "r") as f:
+	data_dir = f.readline()
+f.close()
+
+zarr_path = os.path.join(data_dir, "3Dexpandedprocessed.zarr")
+
+raw = zarr.open(zarr_path, mode='r')
 raw = raw['raw'][index]
 predict = np.load(f'../3DUnet/output_{index}.npy')
 
