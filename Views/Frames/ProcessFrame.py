@@ -3,6 +3,7 @@ from tkinter import ttk, Text, Label
 import os
 import subprocess
 from tkinter.filedialog import askdirectory
+from Model.constants_and_paths import ROOT_STR
 
 import numpy as np
 import tifffile
@@ -95,12 +96,16 @@ class ProcessFrame(ttk.Frame):
         rawDataPath = self.selectFolderframe.getRawDataPath()
         gtDataPath = self.selectFolderframe.getGtDataPath()
         thresholdsNpyPath = self.selectFolderframe.getThreholdsNpyPath()
+        
+        dataFolderPath = rawDataPath[:-3]
+        self.recordDataDirPath(dataFolderPath)
 
         print("rawDataPath:  "+rawDataPath)
         print("gtDataPath:  "+gtDataPath)
         print("thresholdsNpyPath:  "+thresholdsNpyPath)
+        print("dataFolderPath:  "+dataFolderPath)
 
-        zarr_container = zarr.open('./output/3Dtraining.zarr', 'w')
+        zarr_container = zarr.open(dataFolderPath+'/3Dtraining.zarr', 'w')
 
         '''
         ***************************************test for only 1*********************************************************
@@ -179,10 +184,11 @@ class ProcessFrame(ttk.Frame):
 
     def execute_process_expand(self):
         rawDataPath = self.selectFolderframe.getRawDataPath()
+        dataFolderPath = rawDataPath[:-3]
 
         names = []
 
-        zarr_container = zarr.open('./output/3Dexpanded.zarr', 'w')
+        zarr_container = zarr.open(dataFolderPath+'/3Dexpanded.zarr', 'w')
 
         '''
         ***************************************test for only 1*********************************************************
@@ -243,4 +249,10 @@ class ProcessFrame(ttk.Frame):
             num_name = num_name + 1
 
         self.save_to_container(raw, zarr_container, 'raw')
+
+    def recordDataDirPath(self, DataDirPath):
+        with open(ROOT_STR+"DataDirPath.txt", "w") as f:
+            f.write(DataDirPath)
+        f.close()
+
 

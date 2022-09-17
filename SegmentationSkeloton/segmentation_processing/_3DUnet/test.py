@@ -17,6 +17,8 @@ import zarr
 import torch
 import torch.nn as nn
 
+from Model.constants_and_paths import ROOT_STR
+
 logging.basicConfig(level=logging.ERROR)
 
 # n_samples = 21
@@ -94,6 +96,12 @@ def mknet():
     return(model)
 
 def test():
+    with open(ROOT_STR+"DataDirPath.txt", "r") as f:
+        data_dir = f.readline()
+    f.close()
+
+    zarr_path = os.path.join(data_dir, zarr_name)
+
     #for im_index in range(n_samples):
     im_index = CURRENT_IMAGE
     model = mknet()
