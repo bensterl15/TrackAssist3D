@@ -64,28 +64,19 @@ class TrainingFrame(ttk.Frame):
     def process(self):
         self.textFrame.insert('Runing train.py ...')
 
-        '''
-            Plan B: run the code directly, but can't show the information in the text box
-        '''
-
-
-        '''
-        tb = program.TensorBoard()
-        tb.configure(argv=[None, '--logdir', ' C:\\Users\\bsterling\\PycharmProjects\\FiloTracker\\output\\logs\\'])
-        url = tb.launch()
-        '''
-
+        # Open a tensorboard instance on port 8090:
         subprocess.Popen('tensorboard --logdir=\'C:\\Users\\bsterling\\PycharmProjects\\FiloTracker\\output\\logs\' --port=8009')
 
-        #self.textFrame.insert(f'Tensorflow listening on {url}')
+        url = 'http://localhost:8009/'
+        self.textFrame.insert(f'Tensorflow listening on {url}')
 
         train.train(self.pdict)
 
-        self.textFrame.insert( 'Done')
+        self.textFrame.insert('Done')
 
     def load_params(self):
         self.path_params = filedialog.askopenfilename(title='Select saved model parameters',
-                                                      filetypes=(("Pickle Files","*.pickle"),))
+                                                      filetypes=(("Pickle Files", "*.pickle"),))
         try:
             #print(self.path_params)
             with open(self.path_params, 'rb') as f:
