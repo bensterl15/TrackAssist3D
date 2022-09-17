@@ -3,7 +3,6 @@ from tkinter import ttk, Text, Label
 import os
 import subprocess
 from tkinter.filedialog import askdirectory
-from Model.constants_and_paths import ROOT_STR
 
 import numpy as np
 import tifffile
@@ -105,7 +104,7 @@ class ProcessFrame(ttk.Frame):
         print("thresholdsNpyPath:  "+thresholdsNpyPath)
         print("dataFolderPath:  "+dataFolderPath)
 
-        zarr_container = zarr.open(dataFolderPath+'/3Dtraining.zarr', 'w')
+        zarr_container = zarr.open(dataFolderPath+'/output/3Dtraining.zarr', 'w')
 
         '''
         ***************************************test for only 1*********************************************************
@@ -188,7 +187,7 @@ class ProcessFrame(ttk.Frame):
 
         names = []
 
-        zarr_container = zarr.open(dataFolderPath+'/3Dexpanded.zarr', 'w')
+        zarr_container = zarr.open(dataFolderPath+'/output/3Dexpanded.zarr', 'w')
 
         '''
         ***************************************test for only 1*********************************************************
@@ -251,7 +250,8 @@ class ProcessFrame(ttk.Frame):
         self.save_to_container(raw, zarr_container, 'raw')
 
     def recordDataDirPath(self, DataDirPath):
-        with open(ROOT_STR+"DataDirPath.txt", "w") as f:
+        # ROOT_STR = os.path.dirname(os.path.realpath(__file__))
+        with open("..\\..\\DataDirPath.txt", "w") as f:
             f.write(DataDirPath)
         f.close()
 

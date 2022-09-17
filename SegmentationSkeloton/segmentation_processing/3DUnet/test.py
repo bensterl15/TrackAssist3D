@@ -17,7 +17,6 @@ import zarr
 import torch
 import torch.nn as nn
 
-from Model.constants_and_paths import ROOT_STR
 
 logging.basicConfig(level=logging.ERROR)
 
@@ -96,8 +95,7 @@ def mknet():
     return(model)
 
 def test():
-
-    with open(ROOT_STR+"DataDirPath.txt", "r") as f:
+    with open("..\\..\\..\\DataDirPath.txt", "r") as f:
         data_dir = f.readline()
     f.close()
 

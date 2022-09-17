@@ -18,6 +18,8 @@ class TrainingFrame(ttk.Frame):
         self.columnconfigure(0, weight=5)
         self.columnconfigure(1, weight=1)
 
+        self.is_default_param = tk.BooleanVar()
+
         self.__create_widgets()
 
     def __create_widgets(self):
@@ -31,13 +33,17 @@ class TrainingFrame(ttk.Frame):
         # convert button
         params_open_button = ttk.Button(
             self,
-            text='Select raw data folder',
+            text='Select model params',
             command=self.load_params
         )
         params_open_button.grid(column=1, row=0, sticky='E', **options)
 
         # Add a checkbox:
-        ch_default = tk.Checkbutton(self, text='Use default model params')
+        ch_default = tk.Checkbutton(self,
+                                    text='Use default model params',
+                                    variable=self.is_default_param,
+                                    onvalue=True,
+                                    offvalue=False)
         ch_default.grid(column=1, row=1)
 
         # convert button
@@ -70,7 +76,7 @@ class TrainingFrame(ttk.Frame):
         url = 'http://localhost:8009/'
         self.textFrame.insert(f'Tensorflow listening on {url}')
 
-        train.train(self.pdict)
+        train.train(self.pdict, self.is_default_param.get())
 
         self.textFrame.insert('Done')
 

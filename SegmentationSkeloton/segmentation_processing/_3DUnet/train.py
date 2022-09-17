@@ -17,7 +17,6 @@ import torch.nn.functional as F
 
 import os
 
-from Model.constants_and_paths import ROOT_STR
 
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 
@@ -32,7 +31,23 @@ zarr_name = '3Dtraining.zarr'
 zarr_path = os.path.join(data_dir, zarr_name)
 log_dir = 'C:\\Users\\bsterling\\PycharmProjects\\FiloTracker\\output\\logs\\'
 
+num_fmaps = 256
+input_shape = gp.Coordinate((12, 128, 128))
+output_shape = gp.Coordinate((2, 88, 88))
 
+batch_size = 2
+
+voxel_size = gp.Coordinate((1, 1, 1))
+input_size = input_shape * voxel_size
+output_size = output_shape * voxel_size
+
+checkpoint_every = 200
+train_until = 2000
+snapshot_every = 200
+zarr_snapshot = False
+
+num_workers = 16
+cache_size = 100
 
 class CustomLoss(torch.nn.Module):
     def __init__(self, weight=None, size_average=True):
@@ -44,6 +59,29 @@ class CustomLoss(torch.nn.Module):
         BCE = F.binary_cross_entropy(inputs, targets, reduction='mean')
         return BCE
 
+def mknet():
+	unet = UNet(
+		in_channels = 1,
+		num_fmaps = num_fmaps,
+		fmap_inc_factor = 2,
+		downsample_factors = [
+			[1, 2, 2],
+			[1, 2, 2],
+			#[1, 3, 3],
+		],
+		kernel_size_down = [[[2, 3, 3], [2, 3, 3]]]*3,
+		kernel_size_up   = [[[2, 3, 3], [2, 3, 3]]]*2,
+		)
+
+	unet = nn.DataParallel(unet)
+	convpass = ConvPass(num_fmaps, 1, [[1, 1, 1]], activation='Sigmoid')
+	convpass = nn.DataParallel(convpass)
+
+	model = torch.nn.Sequential(
+		unet,
+		convpass,
+		)
+	return(model)
 
 def mknet(pdict):
     num_fmaps = pdict['num_fmaps']
@@ -74,28 +112,34 @@ def mknet(pdict):
     return (model)
 
 
-def train(pdict):
-    with open(ROOT_STR+"DataDirPath.txt", "r") as f:
+def train(pdict, is_default_param):
+    with open("..\\..\\..\\DataDirPath.txt", "r") as f:
         data_dir = f.readline()
     f.close()
 
     zarr_path = os.path.join(data_dir, zarr_name)
 
+    if is_default_param == True:
+        print("Use default model param")
+        model = mknet()
+        loss = torch.nn.BCELoss()
+        optimizer = torch.optim.Adam(lr=5e-5, params=model.parameters())
+    else:
+        print("Set model param")
+        batch_size = pdict['batch_size']
+        snapshot_every = pdict['snapshot_every']
+        voxel_size = gp.Coordinate(pdict['voxel_size'])
+        input_shape = gp.Coordinate(pdict['input_shape'])
+        output_shape = gp.Coordinate(pdict['output_shape'])
 
-    batch_size = pdict['batch_size']
-    snapshot_every = pdict['snapshot_every']
-    voxel_size = gp.Coordinate(pdict['voxel_size'])
-    input_shape = gp.Coordinate(pdict['input_shape'])
-    output_shape = gp.Coordinate(pdict['output_shape'])
+        input_size = input_shape * voxel_size
+        output_size = output_shape * voxel_size
 
-    input_size = input_shape * voxel_size
-    output_size = output_shape * voxel_size
-
-    iterations = pdict['train_until']
-    learning_rate = pdict['learning_rate']
-    model = mknet(pdict)
-    loss = torch.nn.BCELoss()
-    optimizer = torch.optim.Adam(lr=learning_rate, params=model.parameters())
+        iterations = pdict['train_until']
+        learning_rate = pdict['learning_rate']
+        model = mknet(pdict)
+        loss = torch.nn.BCELoss()
+        optimizer = torch.optim.Adam(lr=learning_rate, params=model.parameters())
 
     raw = gp.ArrayKey('raw')
     gt = gp.ArrayKey('gt')
