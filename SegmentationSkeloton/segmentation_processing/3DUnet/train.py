@@ -17,7 +17,6 @@ import torch.nn.functional as F
 
 import os
 
-from Model.constants_and_paths import ROOT_STR
 
 os.environ["KMP_DUPLICATE_LIB_OK"]="TRUE"
 
@@ -100,7 +99,7 @@ def mknet():
 	return(model)
 
 def train(iterations):
-	with open(ROOT_STR + "DataDirPath.txt", "r") as f:
+	with open( "..\\..\\..\\DataDirPath.txt", "r") as f:
 		data_dir = f.readline()
 	f.close()
 

@@ -17,7 +17,6 @@ import zarr
 import torch
 import torch.nn as nn
 
-from Model.constants_and_paths import ROOT_STR
 
 logging.basicConfig(level=logging.ERROR)
 
@@ -95,8 +94,8 @@ def mknet():
     )
     return(model)
 
-def test():
-    with open(ROOT_STR+"DataDirPath.txt", "r") as f:
+def test(model_checkpoint_path, is_default_model):
+    with open("..\\..\\..\\DataDirPath.txt", "r") as f:
         data_dir = f.readline()
     f.close()
 
@@ -104,8 +103,15 @@ def test():
 
     #for im_index in range(n_samples):
     im_index = CURRENT_IMAGE
+
     model = mknet()
-    model.load_state_dict(torch.load('model_checkpoint_' + highest_model)['model_state_dict'])
+
+    if is_default_model:
+        print("user default highest model")
+        model.load_state_dict(torch.load('model_checkpoint_' + highest_model)['model_state_dict'])
+    else:
+        print("Set the model checkpoint manually")
+        model.load_state_dict(torch.load(model_checkpoint_path)['model_state_dict'])
     model.eval()
 
     raw = gp.ArrayKey('raw')
@@ -157,51 +163,51 @@ def test():
     print(output.shape)
     np.save('output_' + str(im_index) + '.npy', output)
 
-if __name__ == '__main__':
-
-    '''
-    import argparse
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--image', type=str, required=True)
-    args = parser.parse_args()
-    CURRENT_IMAGE = args.image
-    print(f'CURRENT_IMAGE: {CURRENT_IMAGE}')
-    '''
-	
-    for i in range(n_samples):
-        i = CURRENT_IMAGE
-        test()
-        f_name = 'output_' + str(i)
-	
-        output = np.load(f_name + '.npy')
-        output = np.squeeze(output)
-        #output[output >= 0.5] = 1
-        #output[output < 0.5] = 0
-        
-        imsave(f_name + '.tif', output)
-        img = nib.Nifti1Image(output, affine=np.eye(4))
-        nib.save(img, f_name + '.nii')
-
-if __name__ == "SegmentationSkeloton.segmentation_processing._3DUnet.test":
-    '''
-        import argparse
-        parser = argparse.ArgumentParser()
-        parser.add_argument('--image', type=str, required=True)
-        args = parser.parse_args()
-        CURRENT_IMAGE = args.image
-        print(f'CURRENT_IMAGE: {CURRENT_IMAGE}')
-        '''
-
-    for i in range(n_samples):
-        i = CURRENT_IMAGE
-        test()
-        f_name = 'output_' + str(i)
-
-        output = np.load(f_name + '.npy')
-        output = np.squeeze(output)
-        # output[output >= 0.5] = 1
-        # output[output < 0.5] = 0
-
-        imsave(f_name + '.tif', output)
-        img = nib.Nifti1Image(output, affine=np.eye(4))
-        nib.save(img, f_name + '.nii')
+# if __name__ == '__main__':
+#
+#     '''
+#     import argparse
+#     parser = argparse.ArgumentParser()
+#     parser.add_argument('--image', type=str, required=True)
+#     args = parser.parse_args()
+#     CURRENT_IMAGE = args.image
+#     print(f'CURRENT_IMAGE: {CURRENT_IMAGE}')
+#     '''
+#
+#     for i in range(n_samples):
+#         i = CURRENT_IMAGE
+#         test()
+#         f_name = 'output_' + str(i)
+#
+#         output = np.load(f_name + '.npy')
+#         output = np.squeeze(output)
+#         #output[output >= 0.5] = 1
+#         #output[output < 0.5] = 0
+#
+#         imsave(f_name + '.tif', output)
+#         img = nib.Nifti1Image(output, affine=np.eye(4))
+#         nib.save(img, f_name + '.nii')
+#
+# if __name__ == "SegmentationSkeloton.segmentation_processing._3DUnet.test":
+#     '''
+#         import argparse
+#         parser = argparse.ArgumentParser()
+#         parser.add_argument('--image', type=str, required=True)
+#         args = parser.parse_args()
+#         CURRENT_IMAGE = args.image
+#         print(f'CURRENT_IMAGE: {CURRENT_IMAGE}')
+#         '''
+#
+#     for i in range(n_samples):
+#         i = CURRENT_IMAGE
+#         test()
+#         f_name = 'output_' + str(i)
+#
+#         output = np.load(f_name + '.npy')
+#         output = np.squeeze(output)
+#         # output[output >= 0.5] = 1
+#         # output[output < 0.5] = 0
+#
+#         imsave(f_name + '.tif', output)
+#         img = nib.Nifti1Image(output, affine=np.eye(4))
+#         nib.save(img, f_name + '.nii')
