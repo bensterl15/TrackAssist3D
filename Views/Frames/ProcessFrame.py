@@ -3,7 +3,7 @@ from tkinter import ttk, Text, Label
 import os
 import subprocess
 from tkinter.filedialog import askdirectory
-from Model.constants_and_paths import ROOT_STR
+import Model.constants_and_paths as mcp
 
 import numpy as np
 import tifffile
@@ -97,7 +97,7 @@ class ProcessFrame(ttk.Frame):
         gtDataPath = self.selectFolderframe.getGtDataPath()
         thresholdsNpyPath = self.selectFolderframe.getThreholdsNpyPath()
         
-        dataFolderPath = rawDataPath[:-3]
+        dataFolderPath = os.path.dirname(rawDataPath)#[:-3]
         self.recordDataDirPath(dataFolderPath)
 
         print("rawDataPath:  "+rawDataPath)
@@ -251,8 +251,11 @@ class ProcessFrame(ttk.Frame):
         self.save_to_container(raw, zarr_container, 'raw')
 
     def recordDataDirPath(self, DataDirPath):
+        mcp.ROOT_STR = DataDirPath
+        '''
         with open(ROOT_STR+"DataDirPath.txt", "w") as f:
             f.write(DataDirPath)
         f.close()
+        '''
 
 

@@ -17,7 +17,7 @@ import torch.nn.functional as F
 
 import os
 
-from Model.constants_and_paths import ROOT_STR
+import Model.constants_and_paths as mcp
 
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 
@@ -75,9 +75,13 @@ def mknet(pdict):
 
 
 def train(pdict):
+    '''
     with open(ROOT_STR+"DataDirPath.txt", "r") as f:
         data_dir = f.readline()
     f.close()
+    '''
+
+    data_dir = mcp.ROOT_STR
 
     zarr_path = os.path.join(data_dir, zarr_name)
 

@@ -1,7 +1,7 @@
 import os
 import sys
 
-DEBUG = False#True
+DEBUG = True # False #
 
 
 def resource_path(relative_path):
@@ -25,16 +25,17 @@ TRACKING_PATH_OFFSET = os.path.join(ANALYSIS_OFFSET, 'FiloTracker_Protrusion_Tra
 VALID_USHAPE3D_DIR_ERROR_MSG = 'Please ensure all directories are valid u-shape3D directories (contains movieData.mat)'
 MAX_PROTRUSIONS_INDEX = 1e8
 
+global ROOT_STR
+
 if DEBUG:
-    ROOT_STR = "C:\\Users\\bsterling\\PycharmProjects\\FiloTracker\\"
-    # ROOT_STR = "D:\\FiloTracker\\"
-    PAIRING_WINDOW_BACKGROUND_PATH = ROOT_STR + "TA3D_Logo.PNG"
+    ROOT_STR_ = "C:\\Users\\bsterling\\PycharmProjects\\FiloTracker\\"
+    PAIRING_WINDOW_BACKGROUND_PATH = ROOT_STR_ + "TA3D_Logo.PNG"
     REMOVER_WINDOW_BACKGROUND_PATH = PAIRING_WINDOW_BACKGROUND_PATH
     LOADING_WINDOW_BACKGROUND_PATH = PAIRING_WINDOW_BACKGROUND_PATH
-    PLUS_BUTTON_PATH = ROOT_STR + "plus_button.PNG"
-    MINUS_BUTTON_PATH = ROOT_STR+"minus_button.PNG"
-    NEXT_BUTTON_PATH = ROOT_STR+"next_button.PNG"
-    ICON_PATH = ROOT_STR+"TA3D_Icon.ico"
+    PLUS_BUTTON_PATH = ROOT_STR_ + "plus_button.PNG"
+    MINUS_BUTTON_PATH = ROOT_STR_ + "minus_button.PNG"
+    NEXT_BUTTON_PATH = ROOT_STR_ + "next_button.PNG"
+    ICON_PATH = ROOT_STR_ + "TA3D_Icon.ico"
 else:
     PAIRING_WINDOW_BACKGROUND_PATH = resource_path('TA3D_Logo.PNG')
     REMOVER_WINDOW_BACKGROUND_PATH = PAIRING_WINDOW_BACKGROUND_PATH

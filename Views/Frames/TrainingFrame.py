@@ -31,7 +31,7 @@ class TrainingFrame(ttk.Frame):
         # convert button
         params_open_button = ttk.Button(
             self,
-            text='Select raw data folder',
+            text='Select model file',
             command=self.load_params
         )
         params_open_button.grid(column=1, row=0, sticky='E', **options)
