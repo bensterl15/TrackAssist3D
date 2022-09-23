@@ -26,17 +26,15 @@ class InitWindow:
         self.label0 = ttk.Label(self.win, text='Choose the tool', font=('Helvatical bold', 15), style="H.TLabel")
         self.label0.place(x=50, y=50)
 
+        self.button2 = ttk.Button(self.win, text='Go to: ', command=self.goToSegmentationSkeloton)
+        self.button2.place(x=50, y=100)
+        self.label2 =  ttk.Label(self.win, text='Segmentation Pipeline', font=('Helvatical',15))
+        self.label2.place(x=150, y=100)
 
         self.button1 = ttk.Button(self.win, text='Go to: ', command=self.goToFiloTracker)
-        self.button1.place(x=50, y=100)
-        self.label1 =  ttk.Label(self.win, text='FiloTracker', font=('Helvatical',15))
-        self.label1.place(x=150, y=100)
-
-        self.button2 = ttk.Button(self.win, text='Go to: ', command=self.goToSegmentationSkeloton)
-        self.button2.place(x=50, y=150)
-        self.label2 =  ttk.Label(self.win, text='SegmentationSkeloton', font=('Helvatical',15))
-        self.label2.place(x=150, y=150)
-
+        self.button1.place(x=50, y=150)
+        self.label1 =  ttk.Label(self.win, text='Tracking Pipeline', font=('Helvatical',15))
+        self.label1.place(x=150, y=150)
 
 
     def goToFiloTracker(self):

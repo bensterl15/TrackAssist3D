@@ -18,7 +18,7 @@ class TrainingFrame(ttk.Frame):
         self.columnconfigure(0, weight=5)
         self.columnconfigure(1, weight=1)
 
-        self.is_default_param = tk.BooleanVar()
+        self.is_default_param = False
 
         self.__create_widgets()
 
@@ -31,19 +31,19 @@ class TrainingFrame(ttk.Frame):
         self.params_button.focus()
 
         # convert button
-        params_open_button = ttk.Button(
+        self.params_open_button = ttk.Button(
             self,
             text='Select model params',
             command=self.load_params
         )
-        params_open_button.grid(column=1, row=0, sticky='E', **options)
+        self.params_open_button.grid(column=1, row=0, sticky='E', **options)
 
         # Add a checkbox:
         ch_default = tk.Checkbutton(self,
                                     text='Use default model params',
-                                    variable=self.is_default_param,
                                     onvalue=True,
-                                    offvalue=False)
+                                    offvalue=False,
+                                    command=self.toggle_default_param)
         ch_default.grid(column=1, row=1)
 
         # convert button
@@ -76,7 +76,12 @@ class TrainingFrame(ttk.Frame):
         url = 'http://localhost:8009/'
         self.textFrame.insert(f'Tensorflow listening on {url}')
 
-        train.train(self.pdict, self.is_default_param.get())
+        if hasattr(self, 'pdict'):
+            pdict = self.pdict
+        else:
+            pdict = None
+
+        train.train(pdict, self.is_default_param)
 
         self.textFrame.insert('Done')
 
@@ -92,3 +97,12 @@ class TrainingFrame(ttk.Frame):
 
     def stop(self):
         exit()
+
+    def toggle_default_param(self):
+        self.is_default_param = not self.is_default_param
+        if self.is_default_param:
+            self.params_open_button['state'] = 'disabled'
+            self.params_button['state'] = 'disabled'
+        else:
+            self.params_open_button['state'] = 'normal'
+            self.params_button['state'] = 'normal'

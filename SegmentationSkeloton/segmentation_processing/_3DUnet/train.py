@@ -27,10 +27,7 @@ n_samples = 21
 # n_samples = 1
 
 data_dir = ""
-
 zarr_name = '3Dtraining.zarr'
-zarr_path = os.path.join(data_dir, zarr_name)
-log_dir = 'C:\\Users\\bsterling\\PycharmProjects\\FiloTracker\\output\\logs\\'
 
 
 
@@ -45,13 +42,26 @@ class CustomLoss(torch.nn.Module):
         return BCE
 
 
-def mknet(pdict):
-    num_fmaps = pdict['num_fmaps']
-    fmap_inc_factor = pdict['fmap_inc_factor'][0]
-    downsample_factors = pdict['downsample_factors']
-    kernel_size_down = pdict['kernel_size_down']
-    kernel_size_up = pdict['kernel_size_up']
-    in_channels = pdict['in_channels'][0]
+def mknet(pdict, is_default_param):
+    if is_default_param:
+        num_fmaps = 256
+        fmap_inc_factor = 2
+        downsample_factors = [[1, 2, 2], [1, 2, 2],]
+        kernel_size_down = [[[2, 3, 3], [2, 3, 3]]] * 3
+        kernel_size_up = [[[2, 3, 3], [2, 3, 3]]] * 2
+        in_channels = 1
+        conv_in_channels = 1
+        conv_kernel = [[1, 1, 1]]
+    else:
+        num_fmaps = pdict['num_fmaps']
+        fmap_inc_factor = pdict['fmap_inc_factor'][0]
+        downsample_factors = pdict['downsample_factors']
+        kernel_size_down = pdict['kernel_size_down']
+        kernel_size_up = pdict['kernel_size_up']
+        in_channels = pdict['in_channels'][0]
+        conv_in_channels = pdict['conv_in_channels']
+        conv_kernel = pdict['conv_kernel']
+
     unet = UNet(
         in_channels=in_channels,
         num_fmaps=num_fmaps,
@@ -61,8 +71,6 @@ def mknet(pdict):
         kernel_size_up=kernel_size_up,
     )
 
-    conv_in_channels = pdict['conv_in_channels']
-    conv_kernel = pdict['conv_kernel']
     unet = nn.DataParallel(unet)
     convpass = ConvPass(num_fmaps, in_channels, conv_kernel, activation='Sigmoid')
     convpass = nn.DataParallel(convpass)
@@ -83,13 +91,23 @@ def train(pdict, is_default_param):
 
     data_dir = mcp.ROOT_STR
 
+    print(data_dir)
+
     zarr_path = os.path.join(data_dir, zarr_name)
 
-    if is_default_param == True:
+    if is_default_param:
         print("Use default model param")
-        model = mknet()
-        loss = torch.nn.BCELoss()
-        optimizer = torch.optim.Adam(lr=5e-5, params=model.parameters())
+        batch_size = 2
+        snapshot_every = 50
+        voxel_size = gp.Coordinate((1, 1, 1))
+        input_shape = gp.Coordinate((12, 128, 128))
+        output_shape = gp.Coordinate((2, 88, 88))
+
+        input_size = input_shape * voxel_size
+        output_size = output_shape * voxel_size
+
+        iterations = 2000
+        learning_rate = 5e-5
     else:
         print("Set model param")
         batch_size = pdict['batch_size']
@@ -103,9 +121,10 @@ def train(pdict, is_default_param):
 
         iterations = pdict['train_until']
         learning_rate = pdict['learning_rate']
-        model = mknet(pdict)
-        loss = torch.nn.BCELoss()
-        optimizer = torch.optim.Adam(lr=learning_rate, params=model.parameters())
+
+    model = mknet(pdict, is_default_param)
+    loss = torch.nn.BCELoss()
+    optimizer = torch.optim.Adam(lr=learning_rate, params=model.parameters())
 
     raw = gp.ArrayKey('raw')
     gt = gp.ArrayKey('gt')
@@ -159,8 +178,8 @@ def train(pdict, is_default_param):
             0: predict,
             1: gt,
         },
-        log_dir=log_dir,
-        save_every=1)#20)
+        log_dir=os.path.join(mcp.ROOT_STR, 'logs'),
+        save_every=1)
 
     pipeline += gp.Squeeze([raw, gt, predict], axis=1)
 

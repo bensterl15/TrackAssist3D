@@ -25,7 +25,7 @@ TRACKING_PATH_OFFSET = os.path.join(ANALYSIS_OFFSET, 'FiloTracker_Protrusion_Tra
 VALID_USHAPE3D_DIR_ERROR_MSG = 'Please ensure all directories are valid u-shape3D directories (contains movieData.mat)'
 MAX_PROTRUSIONS_INDEX = 1e8
 
-global ROOT_STR
+ROOT_STR = ''
 
 if DEBUG:
     ROOT_STR_ = "C:\\Users\\bsterling\\PycharmProjects\\FiloTracker\\"
