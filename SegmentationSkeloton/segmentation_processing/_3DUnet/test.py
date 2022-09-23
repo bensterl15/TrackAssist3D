@@ -163,7 +163,7 @@ def test(model_checkpoint_path, is_default_model):
     output = batch[predict].data
     print(type(output))
     print(output.shape)
-    np.save('output_' + str(im_index) + '.npy', output)
+    np.save(data_dir+'\\output_' + str(im_index) + '.npy', output)
 
 # if __name__ == '__main__':
 #

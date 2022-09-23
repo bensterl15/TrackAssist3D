@@ -17,11 +17,12 @@ print('START')
 
 data_dir = mcp.ROOT_STR
 
-zarr_path = os.path.join(data_dir, "3Dexpandedprocessed.zarr")
+# zarr_path = os.path.join(data_dir, "3Dexpandedprocessed.zarr")
+zarr_path = os.path.join(data_dir, "3Dexpanded.zarr")
 
 raw = zarr.open(zarr_path, mode='r')
 raw = raw['raw'][index]
-predict = np.load(f'../3DUnet/output_{index}.npy')
+predict = np.load(data_dir+f'\\output_{index}.npy')
 
 print("work well")
 
@@ -42,6 +43,6 @@ raw[predict == 0] = 0
 img = nib.Nifti1Image(raw, affine = np.eye(4))
 nib.save(img, 'out.nii')
 
-np.save('surface.npy', raw)
+np.save(data_dir+'\\surface.npy', raw)
 
 print('DONE')
