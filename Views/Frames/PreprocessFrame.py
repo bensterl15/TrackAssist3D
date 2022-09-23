@@ -42,6 +42,8 @@ class PreprocessFrame(ttk.Frame):
     def process(self):
         self.textFrame.insert('Runing preprocess.py ...')
 
+        # from SegmentationSkeloton.segmentation_processing.zarr_creation import zip
+
         from SegmentationSkeloton.segmentation_processing.SurfaceExtract import preprocess
 
         self.textFrame.insert('Done')

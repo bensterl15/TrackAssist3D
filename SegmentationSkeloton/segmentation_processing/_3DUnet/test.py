@@ -16,6 +16,7 @@ from skimage import filters
 import zarr
 import torch
 import torch.nn as nn
+import Model.constants_and_paths as mcp
 
 
 logging.basicConfig(level=logging.ERROR)
@@ -51,7 +52,10 @@ num_workers = 16
 strs = os.listdir('.')
 strs = [int(x[17:]) for x in strs if "model_checkpoint_" in x]
 strs.sort()
-highest_model = strs[-1]
+
+highest_model = 0
+if len(strs) > 0:
+    highest_model = strs[-1]
 # Does not work unless it is multiple of 100 for some reason..
 highest_model = highest_model - (highest_model % 100)
 highest_model = str(highest_model)
@@ -95,9 +99,7 @@ def mknet():
     return(model)
 
 def test(model_checkpoint_path, is_default_model):
-    with open("..\\..\\..\\DataDirPath.txt", "r") as f:
-        data_dir = f.readline()
-    f.close()
+    data_dir = mcp.ROOT_STR
 
     zarr_path = os.path.join(data_dir, zarr_name)
 

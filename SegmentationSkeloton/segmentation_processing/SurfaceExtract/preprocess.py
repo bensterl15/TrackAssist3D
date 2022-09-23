@@ -5,6 +5,7 @@ import scipy.ndimage
 import nibabel as nib
 import numpy as np
 import zarr
+import Model.constants_and_paths as mcp
 
 from Model.constants_and_paths import ROOT_STR
 
@@ -14,15 +15,15 @@ index = 0
 
 print('START')
 
-with open(ROOT_STR + "DataDirPath.txt", "r") as f:
-	data_dir = f.readline()
-f.close()
+data_dir = mcp.ROOT_STR
 
 zarr_path = os.path.join(data_dir, "3Dexpandedprocessed.zarr")
 
 raw = zarr.open(zarr_path, mode='r')
 raw = raw['raw'][index]
 predict = np.load(f'../3DUnet/output_{index}.npy')
+
+print("work well")
 
 raw = np.copy(raw)
 predict = np.squeeze(predict)

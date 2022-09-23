@@ -6,6 +6,7 @@ from tkinter.messagebox import showinfo
 import os
 
 from Views.thresholdsWindow import ThresholdsWindow
+import Model.constants_and_paths as mcp
 
 class SelectFolderFrame(ttk.Frame):
 
@@ -80,6 +81,9 @@ class SelectFolderFrame(ttk.Frame):
         self.rawDataPath = path
         self.set_raw_data_path(path)
 
+        dataFolderPath = os.path.dirname(path)  # [:-3]
+        self.recordDataDirPath(dataFolderPath)
+
         return
 
     def select_gt_data_path(self):
@@ -122,3 +126,6 @@ class SelectFolderFrame(ttk.Frame):
         window = tk.Tk()
         ThresholdsWindow(window, self)
         #window.mainloop()
+
+    def recordDataDirPath(self, DataDirPath):
+        mcp.ROOT_STR = DataDirPath
