@@ -92,8 +92,13 @@ class TrainingFrame(ttk.Frame):
             #print(self.path_params)
             with open(self.path_params, 'rb') as f:
                 self.pdict = pickle.load(f)
+            self.set_params_path(self.path_params)
         except:
             messagebox.showerror('Error', 'Couldnt load the model')
+
+    def set_params_path(self, path):
+        self.params_button.delete(0, 0)
+        self.params_button.insert(0, path)
 
     def stop(self):
         exit()

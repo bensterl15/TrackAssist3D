@@ -15,7 +15,7 @@ class TestFrame(ttk.Frame):
         self.columnconfigure(1, weight=1)
 
         self.model_checkpoint_path = ''
-        self.default_model = tk.BooleanVar()
+        self.use_default_model = tk.BooleanVar()
 
         self.__create_widgets()
 
@@ -38,7 +38,7 @@ class TestFrame(ttk.Frame):
         # Add a checkbox:
         ch_default = tk.Checkbutton(self,
                                     text='Use default model',
-                                    variable=self.default_model,
+                                    variable=self.use_default_model,
                                     onvalue=True,
                                     offvalue=False)
         ch_default.grid(column=1, row=1)
@@ -66,19 +66,24 @@ class TestFrame(ttk.Frame):
 
         from SegmentationSkeloton.segmentation_processing._3DUnet import test
 
-        test.test(self.model_checkpoint_path, self.default_model.get())
+        test.test(self.model_checkpoint_path, self.use_default_model.get())
 
         self.textFrame.insert('Done')
 
     def load_params(self):
         self.model_checkpoint_path = filedialog.askopenfilename(title='Select model checkpoint')
                                                       # filetypes=(("Pickle Files","*.pickle"),))
+        self.set_model_checkpoint_path(self.model_checkpoint_path)
         # try:
         #     #print(self.path_params)
         #     with open(self.path_params, 'rb') as f:
         #         self.pdict = pickle.load(f)
         # except:
         #     messagebox.showerror('Error', 'Couldnt load the model')
+
+    def set_model_checkpoint_path(self, path):
+        self.params_button.delete(0, 0)
+        self.params_button.insert(0, path)
 
     def stop(self):
         exit()

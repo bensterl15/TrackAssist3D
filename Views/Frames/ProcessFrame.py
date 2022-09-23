@@ -96,9 +96,8 @@ class ProcessFrame(ttk.Frame):
         rawDataPath = self.selectFolderframe.getRawDataPath()
         gtDataPath = self.selectFolderframe.getGtDataPath()
         thresholdsNpyPath = self.selectFolderframe.getThreholdsNpyPath()
-        
+
         dataFolderPath = os.path.dirname(rawDataPath)#[:-3]
-        self.recordDataDirPath(dataFolderPath)
 
         print("rawDataPath:  "+rawDataPath)
         print("gtDataPath:  "+gtDataPath)
@@ -249,13 +248,3 @@ class ProcessFrame(ttk.Frame):
             num_name = num_name + 1
 
         self.save_to_container(raw, zarr_container, 'raw')
-
-    def recordDataDirPath(self, DataDirPath):
-        mcp.ROOT_STR = DataDirPath
-        '''
-        with open(ROOT_STR+"DataDirPath.txt", "w") as f:
-            f.write(DataDirPath)
-        f.close()
-        '''
-
-
