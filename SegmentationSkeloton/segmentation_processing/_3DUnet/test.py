@@ -21,8 +21,8 @@ import Model.constants_and_paths as mcp
 
 logging.basicConfig(level=logging.ERROR)
 
-# n_samples = 21
-n_samples = 1
+n_samples = 21
+# n_samples = 1
 
 data_dir = "../zarr_creation/"
 
@@ -103,67 +103,67 @@ def test(model_checkpoint_path, is_default_model):
 
     zarr_path = os.path.join(data_dir, zarr_name)
 
-    #for im_index in range(n_samples):
-    im_index = CURRENT_IMAGE
+    for im_index in range(n_samples):
+    # im_index = CURRENT_IMAGE
 
-    model = mknet()
+        model = mknet()
 
-    if is_default_model:
-        print("user default highest model")
-        model.load_state_dict(torch.load('model_checkpoint_' + highest_model)['model_state_dict'])
-    else:
-        print("Set the model checkpoint manually")
-        model.load_state_dict(torch.load(model_checkpoint_path)['model_state_dict'])
-    model.eval()
+        if is_default_model:
+            print("user default highest model")
+            model.load_state_dict(torch.load('model_checkpoint_' + highest_model)['model_state_dict'])
+        else:
+            print("Set the model checkpoint manually")
+            model.load_state_dict(torch.load(model_checkpoint_path)['model_state_dict'])
+        model.eval()
 
-    raw = gp.ArrayKey('raw')
-    predict = gp.ArrayKey('predict')
-        
-    request = gp.BatchRequest()
-    request.add(raw, full_shape)
-    request.add(predict, full_shape)
+        raw = gp.ArrayKey('raw')
+        predict = gp.ArrayKey('predict')
 
-    source = gp.ZarrSource(
-        zarr_path,
-        {
-            raw: f'raw/{im_index}',
-        },
-        {
-            raw: gp.ArraySpec(interpolatable=True, voxel_size=voxel_size),
-        })
+        request = gp.BatchRequest()
+        request.add(raw, full_shape)
+        request.add(predict, full_shape)
 
-    pipeline = source
-    pipeline += gp.Normalize(raw, factor = 1.0)
+        source = gp.ZarrSource(
+            zarr_path,
+            {
+                raw: f'raw/{im_index}',
+            },
+            {
+                raw: gp.ArraySpec(interpolatable=True, voxel_size=voxel_size),
+            })
 
-    # add "channel" dimensions
-    pipeline += gp.Unsqueeze([raw])
-        
-    # Add "batch" dimensions, which is just 1 in this case:
-    pipeline += gp.Unsqueeze([raw])
+        pipeline = source
+        pipeline += gp.Normalize(raw, factor = 1.0)
 
-    pipeline += Predict(
-        model,
-        inputs={
-            'input' : raw
-        },
-        outputs={
-            0: predict,
-        })
+        # add "channel" dimensions
+        pipeline += gp.Unsqueeze([raw])
 
-    scan_request = gp.BatchRequest()
-    scan_request.add(raw, input_size)
-    scan_request.add(predict, output_size)
-    pipeline += gp.Scan(scan_request)
-	
-    pipeline += gp.Squeeze([raw, predict], axis=1)
+        # Add "batch" dimensions, which is just 1 in this case:
+        pipeline += gp.Unsqueeze([raw])
 
-    with gp.build(pipeline):
-        batch = pipeline.request_batch(request)
-		
-    output = batch[predict].data
-    print(type(output))
-    print(output.shape)
-    np.save(data_dir+'\\output_' + str(im_index) + '.npy', output)
+        pipeline += Predict(
+            model,
+            inputs={
+                'input' : raw
+            },
+            outputs={
+                0: predict,
+            })
+
+        scan_request = gp.BatchRequest()
+        scan_request.add(raw, input_size)
+        scan_request.add(predict, output_size)
+        pipeline += gp.Scan(scan_request)
+
+        pipeline += gp.Squeeze([raw, predict], axis=1)
+
+        with gp.build(pipeline):
+            batch = pipeline.request_batch(request)
+
+        output = batch[predict].data
+        print(type(output))
+        print(output.shape)
+        np.save(data_dir+'\\output_' + str(im_index) + '.npy', output)
 
 # if __name__ == '__main__':
 #

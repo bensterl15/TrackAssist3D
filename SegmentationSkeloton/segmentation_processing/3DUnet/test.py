@@ -101,7 +101,7 @@ def test():
 
     zarr_path = os.path.join(data_dir, zarr_name)
 
-    #for im_index in range(n_samples):
+    # for im_index in range(n_samples):
     im_index = CURRENT_IMAGE
     model = mknet()
     model.load_state_dict(torch.load('model_checkpoint_' + highest_model)['model_state_dict'])
