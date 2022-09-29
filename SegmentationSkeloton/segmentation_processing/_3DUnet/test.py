@@ -21,9 +21,6 @@ import Model.constants_and_paths as mcp
 
 logging.basicConfig(level=logging.ERROR)
 
-n_samples = 21
-# n_samples = 1
-
 data_dir = "../zarr_creation/"
 
 zarr_name = '3Dexpanded.zarr'
@@ -99,9 +96,12 @@ def mknet():
     return(model)
 
 def test(model_checkpoint_path, is_default_model):
+    # Need to load a file to find the number of samples
     data_dir = mcp.ROOT_STR
-
-    zarr_path = os.path.join(data_dir, zarr_name)
+    zarr_path = os.path.join(data_dir, "3Dexpanded.zarr")
+    raw_data = zarr.open(zarr_path, mode='r')
+    n_samples = np.shape(raw_data['raw'])[0]
+    print(data_dir)
 
     for im_index in range(n_samples):
     # im_index = CURRENT_IMAGE

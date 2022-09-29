@@ -23,13 +23,8 @@ os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 
 logging.basicConfig(level=logging.ERROR)
 
-n_samples = 21
-# n_samples = 1
-
 data_dir = ""
 zarr_name = '3Dtraining.zarr'
-
-
 
 class CustomLoss(torch.nn.Module):
     def __init__(self, weight=None, size_average=True):
@@ -83,14 +78,11 @@ def mknet(pdict, is_default_param):
 
 
 def train(pdict, is_default_param):
-    '''
-    with open(ROOT_STR+"DataDirPath.txt", "r") as f:
-        data_dir = f.readline()
-    f.close()
-    '''
-
+    # Need to load a file to find the number of samples
     data_dir = mcp.ROOT_STR
-
+    zarr_path = os.path.join(data_dir, "3Dexpanded.zarr")
+    raw_data = zarr.open(zarr_path, mode='r')
+    n_samples = np.shape(raw_data['raw'])[0]
     print(data_dir)
 
     zarr_path = os.path.join(data_dir, zarr_name)

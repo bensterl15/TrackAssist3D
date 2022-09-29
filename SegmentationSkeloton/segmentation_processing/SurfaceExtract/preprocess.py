@@ -10,7 +10,6 @@ import Model.constants_and_paths as mcp
 from Model.constants_and_paths import ROOT_STR
 
 alpha = 0.1
-n_samples = 21
 
 print('START')
 
@@ -19,6 +18,8 @@ data_dir = mcp.ROOT_STR
 # zarr_path = os.path.join(data_dir, "3Dexpandedprocessed.zarr")
 zarr_path = os.path.join(data_dir, "3Dexpanded.zarr")
 raw_data = zarr.open(zarr_path, mode='r')
+
+n_samples = np.shape(raw_data['raw'])[0]
 
 for index in range(n_samples):
 	raw = raw_data['raw'][index]

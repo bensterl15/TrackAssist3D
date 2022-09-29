@@ -8,6 +8,7 @@ import os
 import subprocess
 #from tensorboard import program
 #from tensorboard import main as tb
+import Model.constants_and_paths as mcp
 
 class TrainingFrame(ttk.Frame):
 
@@ -71,7 +72,7 @@ class TrainingFrame(ttk.Frame):
         self.textFrame.insert('Runing train.py ...')
 
         # Open a tensorboard instance on port 8090:
-        subprocess.Popen('tensorboard --logdir=\'C:\\Users\\bsterling\\PycharmProjects\\FiloTracker\\output\\logs\' --port=8009')
+        subprocess.Popen(f'tensorboard --logdir={mcp.ROOT_STR}\\logs --port=8009')
 
         url = 'http://localhost:8009/'
         self.textFrame.insert(f'Tensorflow listening on {url}')
