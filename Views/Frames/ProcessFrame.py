@@ -11,7 +11,6 @@ import os
 import scipy
 import imageio
 import zarr
-import nibabel as nib
 import scipy.signal
 
 import re
@@ -167,9 +166,6 @@ class ProcessFrame(ttk.Frame):
             except:
                 gt_ = tifffile.imread(gt_name)
 
-            # img = nib.Nifti1Image(raw[num_name], affine=np.eye(4))
-            # nib.save(img, f'ugh{name}.nii')
-
             raw_[raw_ < thresholds[time_index]] = 0
 
             raw[time_index] = raw_
@@ -239,9 +235,6 @@ class ProcessFrame(ttk.Frame):
 
             # We pad with ten layers of zeros on each side:
             raw[num_name, 10:(z_interp - 10)] = raw_
-
-            #img = nib.Nifti1Image(raw[num_name, 10:(z_interp - 10)], affine=np.eye(4))
-            #nib.save(img, f'ugh{name}.nii')
 
             # raw[raw < 0.2] = 0
 
