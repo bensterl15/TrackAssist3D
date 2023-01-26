@@ -1,3 +1,4 @@
+import tkinter
 from tkinter import Button, Label, StringVar, Frame, Listbox, Scrollbar, messagebox, Tk, END
 from tkinter.filedialog import askdirectory
 from PIL import ImageTk, Image
@@ -94,7 +95,11 @@ class LoadingWindow:
     def add_super(self):
         self.listbox1.delete(0, END)
         self.listbox2.delete(0, END)
+
+        root = tkinter.Tk()
+        root.withdraw()
         path = askdirectory(title='Select Super-Directory')
+        root.destroy()
         self.listbox1.insert(self.listbox1.size(), path)
 
         # Only continue if a super directory is selected:

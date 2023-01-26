@@ -28,7 +28,7 @@ MAX_PROTRUSIONS_INDEX = 1e8
 ROOT_STR = ''
 
 if DEBUG:
-    ROOT_STR_ = "C:\\Users\\bsterling\\PycharmProjects\\FiloTracker\\"
+    ROOT_STR_ = '/Users/ben/Desktop/TrackAssist3D/'#"C:\\Users\\bsterling\\PycharmProjects\\FiloTracker\\"
     PAIRING_WINDOW_BACKGROUND_PATH = ROOT_STR_ + "TA3D_Logo.PNG"
     REMOVER_WINDOW_BACKGROUND_PATH = PAIRING_WINDOW_BACKGROUND_PATH
     LOADING_WINDOW_BACKGROUND_PATH = PAIRING_WINDOW_BACKGROUND_PATH
