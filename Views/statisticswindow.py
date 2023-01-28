@@ -1,18 +1,22 @@
 import json
 import os
+import tkinter.messagebox
 from pathlib import Path
 from tkinter import Button, Label, messagebox
 from tkinter.filedialog import asksaveasfile
 from PIL import ImageTk, Image
 
 # Import the constants we need:
-from Model.constants_and_paths import LOADING_WINDOW_BACKGROUND_PATH, TRACKING_PATH_OFFSET, REMOVAL_PATH_OFFSET
+from Model.constants_and_paths import LOADING_WINDOW_BACKGROUND_PATH, TRACKING_PATH_OFFSET, \
+    MESH_PATH_OFFSET, MOTIF_SEGMENT_PATH_OFFSET, REMOVAL_PATH_OFFSET
 
 from Model.mesh import Mesh
 from Model.chain import Chain
 
 import csv
 import numpy as np
+
+import pyvista as pv
 
 
 class StatisticsWindow:
@@ -42,15 +46,25 @@ class StatisticsWindow:
                                         bg='grey',
                                         padx=10,
                                         pady=5)
-        generate_report_button.place(x=145, y=150)
+        generate_report_button.place(x=85, y=150)
+
+        generate_movie = Button(win,
+                                text='Generate Movie',
+                                command=self.generate_movie,
+                                bg='grey',
+                                padx=10,
+                                pady=5)
+        generate_movie.place(x=205, y=150)
 
         back_button = Button(win, text='Return To Main Menu', command=self.back_requested)
         back_button.place(x=137, y=210)
 
         self._init_chains()
 
+        ''' Print out the chain:
         for chain in self.chains:
             chain.print_contents()
+        '''
 
     def generate_report(self):
         f = asksaveasfile(mode='w', defaultextension='.csv')
@@ -64,7 +78,7 @@ class StatisticsWindow:
             for i in range(len(self.chains)):
                 ids.append(self.chains[i].unique_id)
 
-            writer.writerow(['Filo_Index:'] + ids)
+            writer.writerow(['Protrusion_Index:'] + ids)
 
             for stat in self._gather_stats_keys():
                 writer.writerow([stat + ':'])
@@ -72,6 +86,52 @@ class StatisticsWindow:
                     stat_row = self._load_line_of_stats(stat, cell_index)
                     writer.writerow(['t = ' + str(cell_index)] + stat_row)
             f.close()
+
+    def generate_movie(self):
+        f = asksaveasfile(mode='w', defaultextension='.mp4')
+
+        # If None, the user hit cancel:
+        if f is not None:
+            plotter = pv.Plotter()
+            plotter.open_movie(f.name, framerate=4)
+
+            previous_actors = []
+
+            # Weight the colors, because we do not want anything too close to black or white:
+            self.protrusion_colors = np.random.uniform(size=(len(self.chains), 3)) * 0.3 + 0.3
+
+            for frame_idx, base_frame_path in enumerate(self.view_manager.base_dirs):
+                # Load paths of mesh and motif segmentations:
+                path_mesh = os.path.join(base_frame_path, os.path.join(MESH_PATH_OFFSET, 'surface_1_1.mat'))
+
+                path_segmentation = os.path.join(base_frame_path,
+                                                 os.path.join(REMOVAL_PATH_OFFSET, 'surfaceSegment_1_1.mat'))
+
+                path_statistics = os.path.join(base_frame_path,
+                                               os.path.join(REMOVAL_PATH_OFFSET, 'blebStats_1_1.mat'))
+
+                # Set up the mesh here:
+                mesh = Mesh(path_mesh, path_segmentation, path_statistics)
+
+                # Remove all meshes from the last frame:
+                for actor in previous_actors:
+                    plotter.remove_actor(actor)
+
+                meshes = []
+                base = pv.PolyData(mesh.mesh_vertices, mesh.mesh_faces[mesh.segmentation == 0])
+                previous_actors.append(plotter.add_mesh(base))
+
+                for chain_idx, chain in enumerate(self.chains):
+                    if (chain.starting_time <= frame_idx) and (frame_idx <= chain.last_time):
+                        seg_idx = chain.data[frame_idx - chain.starting_time]
+                        m = pv.PolyData(mesh.mesh_vertices, mesh.mesh_faces[mesh.segmentation == seg_idx])
+                        previous_actors.append(plotter.add_mesh(m,
+                                                                color=self.protrusion_colors[chain_idx],
+                                                                show_edges=False))
+                tkinter.messagebox.showinfo(title='Info', message='Rotate angle before dismissing this dialog')
+                plotter.write_frame()
+            plotter.show()
+            plotter.close()
 
     def back_requested(self):
         self.view_manager.back_to_step()

@@ -76,15 +76,18 @@ class Mesh:
         for key in self.statistics:
             self.statistics[key] = np.delete(self.statistics[key], np.array(indices_to_remove), 0)
 
+        length = []
         azimuth = []
         inclination = []
         for protrusion in self.segmentation_unique:
             # If zero, then we have the cell-base which is not what we are interested in:
             if protrusion != 0:
-                angles = self._calculate_spherical_angles(protrusion=protrusion)
-                azimuth.append(angles[0])
-                inclination.append(angles[1])
+                props_ = self._calculate_spherical_properties(protrusion=protrusion)
+                length.append(props_[0])
+                azimuth.append(props_[1])
+                inclination.append(props_[2])
 
+        self.statistics['length'] = np.array(length)
         self.statistics['azimuth'] = np.array(azimuth)
         self.statistics['inclination'] = np.array(inclination)
 
@@ -105,7 +108,7 @@ class Mesh:
 
         return index_permutation
 
-    def _calculate_spherical_angles(self, protrusion):
+    def _calculate_spherical_properties(self, protrusion):
         # First load the list of faces:
         faces = self.mesh_faces[self.segmentation == protrusion]
         # We only care about the unique vertices that are in the list:
@@ -116,6 +119,7 @@ class Mesh:
         # This is like an estimation of multi-dimensional normal covariance matrix estimator:
         cov_hat = np.matmul(np.transpose(vertices_centered), vertices_centered) / (np.shape(vertices_centered)[0] - 1)
         l, q = np.linalg.eig(cov_hat)
+        l_max = np.max(l)
         greatest_eval_index = np.argmax(l)
         principal_direction = q[:, greatest_eval_index]
 
@@ -147,7 +151,7 @@ class Mesh:
         azimuth = (azimuth + 36000) % 360
         inclination = (inclination + 36000) % 360
 
-        return azimuth, inclination
+        return l_max, azimuth, inclination
 
     # Don't know how, but this should be STATIC METHOD:
     # (We will use it again later in the statistics step:)
